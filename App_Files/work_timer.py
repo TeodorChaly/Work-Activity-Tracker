@@ -1,12 +1,18 @@
 import tkinter as tk
 from time import strftime, gmtime
-from WorkTimeTracker.App_Files.notification import PopupNotification
+from App_Files.notification import PopupNotification
 
 
 class TimerApp:
-    def __init__(self, root):
+    def __init__(self, root, user_name, user_surname, email):
         self.root = root
         root.title("Timer")
+
+        self.user_info_label = tk.Label(root, text=f"{user_name} {user_surname}", font=("Arial", 10))
+        self.user_info_label.pack()
+
+        self.email_label = tk.Label(root, text=email, font=("Arial", 10))
+        self.email_label.pack()
 
         self.time_label = tk.Label(root, text="00:00:00", font=("Arial", 30))
         self.time_label.pack()
@@ -14,20 +20,37 @@ class TimerApp:
         self.start_button = tk.Button(root, text="GO", command=self.start_timer)
         self.start_button.pack()
 
-        self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer)
+        self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer, state=tk.DISABLED)
         self.pause_button.pack()
 
         self.running = False
         self.elapsed_time = 0
         self.time_last_break = 0
 
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.save_interval = 20 * 60 * 1000
+
+    def save_time(self):
+        print("Time saved")
+        pass
+
+    def on_close(self):
+        print("Close")
+        self.save_time()
+        self.root.destroy()
+
     def start_timer(self):
         if not self.running:
             self.running = True
             self.update_timer()
+            self.start_button['state'] = tk.DISABLED
+            self.pause_button['state'] = tk.NORMAL
 
     def pause_timer(self):
+        self.save_time()
         self.running = False
+        self.start_button['state'] = tk.NORMAL
+        self.pause_button['state'] = tk.DISABLED
 
     def update_timer(self):
         if self.running:
@@ -45,8 +68,7 @@ class TimerApp:
     def show_break_notification(self):
         PopupNotification(self.root, "It is time for little break!").show()
 
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = TimerApp(root)
-    root.mainloop()
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = TimerApp(root)
+#     root.mainloop()

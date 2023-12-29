@@ -5,12 +5,12 @@ from tkinter import Label, Entry, Button
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet
 
-from WorkTimeTracker.App_Files.work_timer import TimerApp
-from WorkTimeTracker.DataBase.db_reg_log import register_user, login_user
+from App_Files.work_timer import TimerApp
+from DataBase.db_reg_log import register_user, login_user
 
 
 def load_key():
-    load_dotenv(dotenv_path="Settings/.env")
+    load_dotenv(dotenv_path="Settings/Env_Settings/.env")
     key = os.getenv('SECRET_KEY')
     if not key:
         raise Exception("No SECRET_KEY set")
@@ -43,16 +43,10 @@ class App:
         self.root = root
         self.root.title("Timer App")
 
-        username, lastname, email, password = load_and_decrypt_user_data()
-        if username and lastname and email and password:
-            self.create_main_interface(username, lastname, email, password)
-        else:
-            self.create_login_register_form()
-
-    def create_login_register_form(self):
         self.frame = tk.Frame(self.root)
         self.frame.pack()
 
+        self.first_name_label = Label(self.frame, text="First Name")
         self.first_name_entry = Entry(self.frame)
         self.last_name_label = Label(self.frame, text="Last Name")
         self.last_name_entry = Entry(self.frame)
@@ -67,7 +61,16 @@ class App:
 
         self.is_registration_form = True
         self.update_form_view()
-        pass
+        username, lastname, email, password = load_and_decrypt_user_data()
+        if username and lastname and email and password:
+            self.create_main_interface(username, lastname, email, password)
+
+    #     else:
+    #         self.create_login_register_form()
+    #
+    # def create_login_register_form(self):
+    #
+    #     pass
 
     def toggle_form(self):
         self.is_registration_form = not self.is_registration_form
@@ -78,6 +81,7 @@ class App:
             widget.pack_forget()
 
         if self.is_registration_form:
+            self.first_name_label.pack()
             self.first_name_entry.pack()
             self.last_name_label.pack()
             self.last_name_entry.pack()
@@ -100,7 +104,7 @@ class App:
     def create_main_interface(self, username, lastname, email, password):
         self.root.destroy()
         app_root = tk.Tk()
-        TimerApp(app_root)
+        TimerApp(app_root, username, lastname, email)
 
     def submit_form(self):
         email = self.email_entry.get()

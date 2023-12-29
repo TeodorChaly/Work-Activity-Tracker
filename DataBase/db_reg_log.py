@@ -1,6 +1,5 @@
-import hashlib
 from mysql.connector import Error
-from WorkTimeTracker.DataBase.db_connection import create_db_connection
+from DataBase.db_connection import create_db_connection
 import bcrypt
 
 

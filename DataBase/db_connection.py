@@ -5,7 +5,7 @@ import os
 
 
 def create_db_connection():
-    load_dotenv(dotenv_path="Settings/.env")
+    load_dotenv(dotenv_path="Env_Settings/.env")
     connection = None
     try:
         connection = mysql.connector.connect(
