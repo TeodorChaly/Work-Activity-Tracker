@@ -58,19 +58,12 @@ class App:
         self.submit_button = Button(self.frame, text="Submit", command=self.submit_form)
 
         self.toggle_button = Button(self.frame, text="Switch to Login", command=self.toggle_form)
-
+        
         self.is_registration_form = True
         self.update_form_view()
         username, lastname, email, password = load_and_decrypt_user_data()
         if username and lastname and email and password:
             self.create_main_interface(username, lastname, email, password)
-
-    #     else:
-    #         self.create_login_register_form()
-    #
-    # def create_login_register_form(self):
-    #
-    #     pass
 
     def toggle_form(self):
         self.is_registration_form = not self.is_registration_form

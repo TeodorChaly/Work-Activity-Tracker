@@ -1,11 +1,13 @@
 import tkinter as tk
 from time import strftime, gmtime
 from App_Files.notification import PopupNotification
+from DataBase.db_time_writing import db_time_write, get_time_from_db
 
 
 class TimerApp:
     def __init__(self, root, user_name, user_surname, email):
         self.root = root
+        self.email = email
         root.title("Timer")
 
         self.user_info_label = tk.Label(root, text=f"{user_name} {user_surname}", font=("Arial", 10))
@@ -24,18 +26,20 @@ class TimerApp:
         self.pause_button.pack()
 
         self.running = False
-        self.elapsed_time = 0
+        self.elapsed_time = get_time_from_db(email)
         self.time_last_break = 0
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.save_interval = 20 * 60 * 1000
+        self.display_time()
 
     def save_time(self):
-        print("Time saved")
-        pass
+        hours, remainder = divmod(self.elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        db_time_write(hours, minutes, seconds, self.email)
+
 
     def on_close(self):
-        print("Close")
         self.save_time()
         self.root.destroy()
 
@@ -52,10 +56,18 @@ class TimerApp:
         self.start_button['state'] = tk.NORMAL
         self.pause_button['state'] = tk.DISABLED
 
+    def display_time(self):
+        # Преобразование секунд в ЧЧ:ММ:СС
+        hours, remainder = divmod(self.elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        time_string = f"{hours:02}:{minutes:02}:{seconds:02}"
+        self.time_label.config(text=time_string)
+
     def update_timer(self):
         if self.running:
-            TIME_REMAINDER = 1 * 60  # Change time remainder
             self.elapsed_time += 1
+            self.display_time()
+            TIME_REMAINDER = 1 * 60  # Change time remainder
             time_string = strftime('%H:%M:%S', gmtime(self.elapsed_time))
             self.time_label.config(text=time_string)
 
