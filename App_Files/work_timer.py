@@ -1,5 +1,6 @@
+import random
 import tkinter as tk
-from time import strftime, gmtime
+from time import strftime, gmtime, time
 from App_Files.notification import PopupNotification
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 
@@ -28,6 +29,7 @@ class TimerApp:
         self.running = False
         self.elapsed_time = get_time_from_db(email)
         self.time_last_break = 0
+        self.next_notification_time = self.get_next_notification_time()
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.save_interval = 20 * 60 * 1000
@@ -37,7 +39,6 @@ class TimerApp:
         hours, remainder = divmod(self.elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
         db_time_write(hours, minutes, seconds, self.email)
-
 
     def on_close(self):
         self.save_time()
@@ -57,11 +58,16 @@ class TimerApp:
         self.pause_button['state'] = tk.DISABLED
 
     def display_time(self):
-        # Преобразование секунд в ЧЧ:ММ:СС
         hours, remainder = divmod(self.elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
         time_string = f"{hours:02}:{minutes:02}:{seconds:02}"
         self.time_label.config(text=time_string)
+
+    def get_next_notification_time(self):
+        return random.randint(10 * 60, 25 * 60)  # Random check from 600 to 900 sec
+
+    def show_notification(self):
+        PopupNotification(self.root, "Time for a break!").show()
 
     def update_timer(self):
         if self.running:
@@ -75,6 +81,12 @@ class TimerApp:
                 self.show_break_notification()
                 self.time_last_break = self.elapsed_time
 
+            self.next_notification_time -= 1
+            if self.next_notification_time <= 0:
+                self.show_notification()
+                self.next_notification_time = self.get_next_notification_time()
+
+            print(self.next_notification_time)
             self.root.after(1000, self.update_timer)
 
     def show_break_notification(self):
