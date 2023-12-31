@@ -1,6 +1,10 @@
 import random
+from time import strftime, gmtime
+
 import tkinter as tk
-from time import strftime, gmtime, time
+from pynput import mouse, keyboard
+
+from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 
@@ -35,6 +39,15 @@ class TimerApp:
         self.save_interval = 20 * 60 * 1000
         self.display_time()
 
+        self.aft_timer = 0
+        self.afk_detector = AFKDetector()
+        mouse_listener = mouse.Listener(on_move=self.afk_detector.update_last_action_time,
+                                        on_click=self.afk_detector.update_last_action_time)
+        keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
+
+        mouse_listener.start()
+        keyboard_listener.start()
+
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -57,6 +70,22 @@ class TimerApp:
         self.start_button['state'] = tk.NORMAL
         self.pause_button['state'] = tk.DISABLED
 
+    def temporary_pause_timer(self):
+        self.save_time()
+        self.running = False
+        self.start_button['state'] = tk.NORMAL
+        self.pause_button['state'] = tk.DISABLED
+        self.wait_for_activity_to_resume_timer()
+
+    def wait_for_activity_to_resume_timer(self):
+        if not self.afk_detector.is_afk():
+            print(f"You have been offline {self.aft_timer}")
+            self.aft_timer = 0
+            self.start_timer()
+        else:
+            self.root.after(1000, self.wait_for_activity_to_resume_timer)
+            self.aft_timer += 1
+
     def display_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -77,9 +106,13 @@ class TimerApp:
             time_string = strftime('%H:%M:%S', gmtime(self.elapsed_time))
             self.time_label.config(text=time_string)
 
-            if self.elapsed_time - self.time_last_break >= TIME_REMAINDER:
-                self.show_break_notification()
-                self.time_last_break = self.elapsed_time
+            # print(self.elapsed_time - self.time_last_break, TIME_REMAINDER)
+            # if self.elapsed_time - self.time_last_break >= TIME_REMAINDER:
+            #     self.show_break_notification()
+            #     self.time_last_break = self.elapsed_time
+
+            if self.afk_detector.is_afk():
+                self.temporary_pause_timer()
 
             self.next_notification_time -= 1
             if self.next_notification_time <= 0:
