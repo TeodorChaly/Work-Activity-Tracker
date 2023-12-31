@@ -7,6 +7,7 @@ from pynput import mouse, keyboard
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
 from DataBase.db_time_writing import db_time_write, get_time_from_db
+from Settings.app_settings import settings_windows
 
 
 class TimerApp:
@@ -15,8 +16,14 @@ class TimerApp:
         self.email = email
         root.title("Timer")
 
-        self.user_info_label = tk.Label(root, text=f"{user_name} {user_surname}", font=("Arial", 10))
-        self.user_info_label.pack()
+        top_frame = tk.Frame(root)
+        top_frame.pack(side=tk.TOP, fill=tk.X)
+
+        self.user_info_label = tk.Label(top_frame, text=f"{user_name} {user_surname}", font=("Arial", 10))
+        self.user_info_label.pack(side=tk.LEFT, padx=10, pady=10)
+
+        self.setting_button = tk.Button(top_frame, text="Settings", command=self.setting_button_click)
+        self.setting_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
         self.email_label = tk.Label(root, text=email, font=("Arial", 10))
         self.email_label.pack()
@@ -36,15 +43,15 @@ class TimerApp:
         self.next_notification_time = self.get_next_notification_time()
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
-        self.save_interval = 20 * 60 * 1000
+        # self.save_interval = 20 * 60 * 1000
         self.display_time()
 
+        # AFK mode checking
         self.aft_timer = 0
         self.afk_detector = AFKDetector()
         mouse_listener = mouse.Listener(on_move=self.afk_detector.update_last_action_time,
                                         on_click=self.afk_detector.update_last_action_time)
         keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
-
         mouse_listener.start()
         keyboard_listener.start()
 
@@ -52,10 +59,6 @@ class TimerApp:
         hours, remainder = divmod(self.elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
         db_time_write(hours, minutes, seconds, self.email)
-
-    def on_close(self):
-        self.save_time()
-        self.root.destroy()
 
     def start_timer(self):
         if not self.running:
@@ -77,6 +80,10 @@ class TimerApp:
         self.pause_button['state'] = tk.DISABLED
         self.wait_for_activity_to_resume_timer()
 
+    def on_close(self):
+        self.save_time()
+        self.root.destroy()
+
     def wait_for_activity_to_resume_timer(self):
         if not self.afk_detector.is_afk():
             print(f"You have been offline {self.aft_timer}")
@@ -95,9 +102,6 @@ class TimerApp:
     def get_next_notification_time(self):
         return random.randint(10 * 60, 25 * 60)  # Random check from 600 to 900 sec
 
-    def show_notification(self):
-        PopupNotification(self.root, "Time for a break!").show()
-
     def update_timer(self):
         if self.running:
             self.elapsed_time += 1
@@ -108,7 +112,7 @@ class TimerApp:
 
             # print(self.elapsed_time - self.time_last_break, TIME_REMAINDER)
             # if self.elapsed_time - self.time_last_break >= TIME_REMAINDER:
-            #     self.show_break_notification()
+            #     PopupNotification(self.root, "It is time for little break!").show()
             #     self.time_last_break = self.elapsed_time
 
             if self.afk_detector.is_afk():
@@ -116,14 +120,14 @@ class TimerApp:
 
             self.next_notification_time -= 1
             if self.next_notification_time <= 0:
-                self.show_notification()
+                PopupNotification(self.root, "Time for a break!").show()
                 self.next_notification_time = self.get_next_notification_time()
 
             print(self.next_notification_time)
             self.root.after(1000, self.update_timer)
 
-    def show_break_notification(self):
-        PopupNotification(self.root, "It is time for little break!").show()
+    def setting_button_click(self):
+        settings_windows(self)
 
 # if __name__ == "__main__":
 #     root = tk.Tk()
