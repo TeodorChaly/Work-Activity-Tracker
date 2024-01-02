@@ -2,8 +2,8 @@ import time
 
 
 class AFKDetector:
-    def __init__(self, timeout=300):  # 5 minutes check AFK
-        self.timeout = timeout
+    def __init__(self, timeout=300):
+        self.timeout = timeout * 60
         self.last_action_time = time.time()
 
     def update_last_action_time(self, *args):

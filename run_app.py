@@ -7,6 +7,7 @@ from cryptography.fernet import Fernet
 
 from App_Files.work_timer import TimerApp
 from DataBase.db_reg_log import register_user, login_user
+from Settings.save_settings import setting_check
 
 
 def load_key():
@@ -58,7 +59,7 @@ class App:
         self.submit_button = Button(self.frame, text="Submit", command=self.submit_form)
 
         self.toggle_button = Button(self.frame, text="Switch to Login", command=self.toggle_form)
-        
+
         self.is_registration_form = True
         self.update_form_view()
         username, lastname, email, password = load_and_decrypt_user_data()
@@ -123,6 +124,7 @@ class App:
 
 
 if __name__ == "__main__":
+    setting_check()
     root = tk.Tk()
     app = App(root)
     root.mainloop()

@@ -1,7 +1,9 @@
 import tkinter as tk
 
+from Settings.save_settings import save_settings
 
-def settings_windows(self):
+
+def settings_windows(self, default_screenshot, default_time_remainder, default_afk_mode):
     setting_window = tk.Toplevel(self.root)
     setting_window.title("Settings")
 
@@ -17,31 +19,31 @@ def settings_windows(self):
     label = tk.Label(setting_window, text="Настройки")
     label.pack(pady=20)
 
-    self.screenshoot_var = tk.BooleanVar(value=True)  # Пример начального значения
-    screenshoot_checkbutton = tk.Checkbutton(setting_window, text="Screenshoot", variable=self.screenshoot_var)
-    screenshoot_checkbutton.pack()
+    self.screenshot_var = tk.BooleanVar(value=default_screenshot // 60)
+    screenshot_checkbutton = tk.Checkbutton(setting_window, text="Screenshot", variable=self.screenshot_var)
+    screenshot_checkbutton.pack()
 
     # Time remainder - Int
     tk.Label(setting_window, text="Time remainder").pack()
-    self.time_remainder_var = tk.StringVar(value="5")  # Пример начального значения
+    self.time_remainder_var = tk.StringVar(value=default_time_remainder)
     time_remainder_entry = tk.Entry(setting_window, textvariable=self.time_remainder_var)
     time_remainder_entry.pack()
 
     # AFK Mode - Int
     tk.Label(setting_window, text="AFK Mode").pack()
-    self.afk_mode_var = tk.StringVar(value="10")  # Пример начального значения
+    self.afk_mode_var = tk.StringVar(value=default_afk_mode // 60)
     afk_mode_entry = tk.Entry(setting_window, textvariable=self.afk_mode_var)
     afk_mode_entry.pack()
 
-    enter_button = tk.Button(setting_window, text="Enter", command=apply)
+    enter_button = tk.Button(setting_window, text="Enter",  command=lambda: apply(self.screenshot_var.get(), self.time_remainder_var.get(), self.afk_mode_var.get()))
     enter_button.pack()
 
     setting_window.grab_set()
 
-    # Screenshoot - True/False
-    # Time remainder - Int
-    # AFK Mode - Int
 
-
-def apply():
-    print("True")
+def apply(screenshot, time_remainder, afk_mode):
+    save_settings(screenshot, time_remainder, afk_mode)
+# screenshot_setting = self.screenshot_var.get()
+# time_remainder_setting = self.time_remainder_var.get()
+# afk_mode_setting = self.afk_mode_var.get()
+# print(screenshot_setting, time_remainder_setting, afk_mode_setting)
