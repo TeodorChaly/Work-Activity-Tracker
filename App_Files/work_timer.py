@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 from time import strftime, gmtime
 
 import tkinter as tk
@@ -6,6 +7,7 @@ from pynput import mouse, keyboard
 
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
+from App_Files.time_checker import check_last_visit
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 from Settings.app_settings import settings_windows
 from Settings.save_settings import load_settings
@@ -59,6 +61,9 @@ class TimerApp:
         keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
         mouse_listener.start()
         keyboard_listener.start()
+
+        self.last_visit_date = datetime.now().date()  # Change last time
+        check_last_visit(self)
 
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
