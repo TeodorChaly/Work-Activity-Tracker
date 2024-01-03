@@ -3,7 +3,9 @@ import tkinter as tk
 from Settings.save_settings import save_settings
 
 
-def settings_windows(self, default_screenshot, default_time_remainder, default_afk_mode):
+def settings_windows(self, default_screenshot, default_afk_mode, default_time_remainder):
+    print(self.screenshot, self.time_remainder, self.afk_mode, 1)
+    print(default_screenshot, default_time_remainder, default_afk_mode, 2)
     setting_window = tk.Toplevel(self.root)
     setting_window.title("Settings")
 
@@ -19,7 +21,7 @@ def settings_windows(self, default_screenshot, default_time_remainder, default_a
     label = tk.Label(setting_window, text="Настройки")
     label.pack(pady=20)
 
-    self.screenshot_var = tk.BooleanVar(value=default_screenshot // 60)
+    self.screenshot_var = tk.BooleanVar(value=default_screenshot)
     screenshot_checkbutton = tk.Checkbutton(setting_window, text="Screenshot", variable=self.screenshot_var)
     screenshot_checkbutton.pack()
 
@@ -31,19 +33,18 @@ def settings_windows(self, default_screenshot, default_time_remainder, default_a
 
     # AFK Mode - Int
     tk.Label(setting_window, text="AFK Mode").pack()
-    self.afk_mode_var = tk.StringVar(value=default_afk_mode // 60)
+    self.afk_mode_var = tk.StringVar(value=default_afk_mode)
     afk_mode_entry = tk.Entry(setting_window, textvariable=self.afk_mode_var)
     afk_mode_entry.pack()
 
-    enter_button = tk.Button(setting_window, text="Enter",  command=lambda: apply(self.screenshot_var.get(), self.time_remainder_var.get(), self.afk_mode_var.get()))
+    enter_button = tk.Button(setting_window, text="Enter",
+                             command=lambda: apply(setting_window, self))
     enter_button.pack()
 
     setting_window.grab_set()
 
 
-def apply(screenshot, time_remainder, afk_mode):
-    save_settings(screenshot, time_remainder, afk_mode)
-# screenshot_setting = self.screenshot_var.get()
-# time_remainder_setting = self.time_remainder_var.get()
-# afk_mode_setting = self.afk_mode_var.get()
-# print(screenshot_setting, time_remainder_setting, afk_mode_setting)
+def apply(setting_window, self):
+    save_settings(self)
+    setting_window.destroy()
+

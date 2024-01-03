@@ -4,17 +4,24 @@ import os
 user_path = "Settings/user_settings.json"
 
 
-def save_settings(screenshot, time_remainder, afk_mode):
+def save_settings(self):
+    screenshot = self.screenshot_var.get()
+    afk = self.afk_mode_var.get()
+    notification = self.time_remainder_var.get()
+
     settings_data = {
         "screenshot": screenshot,
-        "time_remainder": time_remainder,
-        "afk_mode": afk_mode,
+        "time_remainder": notification,
+        "afk_mode": afk,
     }
 
     with open(user_path, "w") as file:
         json.dump(settings_data, file)
 
-    print("Настройки сохранены")
+    self.screenshot = screenshot
+    self.time_remainder = int(notification)
+    self.afk_mode = int(afk)
+    self.next_notification_time = self.time_remainder * 60
 
 
 def load_settings(self, element_to_find):

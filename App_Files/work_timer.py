@@ -128,11 +128,12 @@ class TimerApp:
                 PopupNotification(self.root, "Time for a break!").show()
                 self.next_notification_time = self.time_remainder
 
-            print(self.next_notification_time)
+            print(f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: {self.screenshot}")
             self.root.after(1000, self.update_timer)
 
     def setting_button_click(self):
-        settings_windows(self, self.screenshot, self.afk_mode, self.time_remainder)
+        settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
+                         int(load_settings(self, "time_remainder")))
 
 # if __name__ == "__main__":
 #     root = tk.Tk()
