@@ -7,6 +7,7 @@ from pynput import mouse, keyboard
 
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
+from DataBase.db_logs_operations import session_db_add
 from Time_Activity.time_checker import check_last_visit
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 from Settings.app_settings import settings_windows
@@ -62,8 +63,13 @@ class TimerApp:
         mouse_listener.start()
         keyboard_listener.start()
 
-        self.current_time = datetime.now().date()
+        self.now = datetime.now()
+        self.current_hour = self.now.strftime("%H:%M")
+
+        self.current_time = self.now.date()
         check_last_visit(self.current_time)
+
+        self.session_time = 0
 
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
@@ -77,14 +83,21 @@ class TimerApp:
             self.start_button['state'] = tk.DISABLED
             self.pause_button['state'] = tk.NORMAL
 
-            self.current_time = datetime.now().date()
+            self.now = datetime.now()
+
+            self.current_time = self.now.date()
             check_last_visit(self.current_time)
+
+            self.current_hour = self.now.strftime("%H:%M")
 
     def pause_timer(self):
         self.save_time()
         self.running = False
         self.start_button['state'] = tk.NORMAL
         self.pause_button['state'] = tk.DISABLED
+
+        session_db_add(self.email, self.current_time, self.current_hour, self.session_time, "path/to/screenshots")
+        self.session_time = 0
 
     def temporary_pause_timer(self):
         self.save_time()
@@ -102,6 +115,8 @@ class TimerApp:
             print(f"You have been offline {self.aft_timer}")
             self.aft_timer = 0
             self.start_timer()
+            self.now = datetime.now()
+            self.current_hour = self.now.strftime("%H:%M")
         else:
             self.root.after(1000, self.wait_for_activity_to_resume_timer)
             self.aft_timer += 1
@@ -141,6 +156,8 @@ class TimerApp:
                 self.current_time = datetime.now().date()
                 check_last_visit(self.current_time)
                 self.save_time()
+
+            self.session_time += 1
 
             print(f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: {self.screenshot}")
             self.root.after(1000, self.update_timer)

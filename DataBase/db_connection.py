@@ -9,12 +9,11 @@ def create_db_connection():
     connection = None
     try:
         connection = mysql.connector.connect(
-            host=f'{os.getenv("DB_HOST")}',
-            user=f'{os.getenv("DB_USER")}',
-            passwd=f'{os.getenv("DB_PASSWORD")}',
-            database=f'{os.getenv("DB_NAME")}'
+            host=f'localhost',
+            user=f'root',
+            passwd=f'{123}',
+            database=f'timetrack'
         )
     except Error as e:
         print(f"The error '{e}' occurred")
-
     return connection
