@@ -8,6 +8,7 @@ from cryptography.fernet import Fernet
 from App_Files.work_timer import TimerApp
 from DataBase.db_reg_log import register_user, login_user
 from Settings.save_settings import setting_check
+from Time_Activity.time_checker import check_last_visit
 
 
 def load_key():

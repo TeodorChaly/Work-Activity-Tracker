@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import strftime, gmtime
 
 import tkinter as tk
@@ -7,7 +7,7 @@ from pynput import mouse, keyboard
 
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
-from App_Files.time_checker import check_last_visit
+from Time_Activity.time_checker import check_last_visit
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 from Settings.app_settings import settings_windows
 from Settings.save_settings import load_settings
@@ -62,8 +62,8 @@ class TimerApp:
         mouse_listener.start()
         keyboard_listener.start()
 
-        self.last_visit_date = datetime.now().date()  # Change last time
-        check_last_visit(self)
+        self.current_time = datetime.now().date()
+        check_last_visit(self.current_time)
 
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
@@ -76,6 +76,9 @@ class TimerApp:
             self.update_timer()
             self.start_button['state'] = tk.DISABLED
             self.pause_button['state'] = tk.NORMAL
+
+            self.current_time = datetime.now().date()
+            check_last_visit(self.current_time)
 
     def pause_timer(self):
         self.save_time()
@@ -131,7 +134,13 @@ class TimerApp:
             self.next_notification_time -= 1
             if self.next_notification_time <= 0:
                 PopupNotification(self.root, "Time for a break!").show()
+                print(self.time_remainder)
                 self.next_notification_time = self.time_remainder
+
+            if self.elapsed_time % 10 == 0:  # Check every 10 seconds and save time and DB
+                self.current_time = datetime.now().date()
+                check_last_visit(self.current_time)
+                self.save_time()
 
             print(f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: {self.screenshot}")
             self.root.after(1000, self.update_timer)
