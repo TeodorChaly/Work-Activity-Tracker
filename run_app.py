@@ -1,4 +1,5 @@
 import os
+import time
 
 import tkinter as tk
 from tkinter import Label, Entry, Button
@@ -7,7 +8,7 @@ from cryptography.fernet import Fernet
 
 from App_Files.work_timer import TimerApp
 from DataBase.db_reg_log import register_user, login_user
-from Settings.save_settings import setting_check
+from Settings.save_settings import pre_start_configuration
 from Time_Activity.time_checker import check_last_visit
 
 
@@ -125,7 +126,11 @@ class App:
 
 
 if __name__ == "__main__":
-    setting_check()
-    root = tk.Tk()
-    app = App(root)
-    root.mainloop()
+    try:
+        pre_start_configuration()
+        root = tk.Tk()
+        app = App(root)
+        root.mainloop()
+    except Exception as e:
+        print(e)
+    print(123)

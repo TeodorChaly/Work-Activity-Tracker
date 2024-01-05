@@ -1,3 +1,4 @@
+import os
 import random
 from datetime import datetime, timedelta
 from time import strftime, gmtime
@@ -8,7 +9,6 @@ from pynput import mouse, keyboard
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
 from DataBase.db_logs_operations import session_db_add, get_time_today
-from Time_Activity.time_checker import check_last_visit
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 from Settings.app_settings import settings_windows
 from Settings.save_settings import load_settings
@@ -45,20 +45,20 @@ class TimerApp:
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
         self.time_remainder = int(load_settings(self, "time_remainder")) * 60
-        print(self.screenshot, self.afk_mode, self.time_remainder)
+        # print(self.screenshot, self.afk_mode, self.time_remainder)
 
         # Time settings
         self.now = datetime.now()
         self.current_hour = self.now.strftime("%H:%M")
 
         self.current_time = self.now.date()
-        check_last_visit(self.current_time)
+        # check_last_visit(self.current_time)
 
         self.session_time = 0
 
         # General settings
         self.running = False
-        self.elapsed_time = get_time_today(self.email, self.current_time) #  "2024-01-02" self.current_time
+        self.elapsed_time = get_time_today(self.email, self.current_time)  # "2024-01-02" self.current_time
         self.time_last_break = 0
         self.next_notification_time = self.time_remainder
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -88,7 +88,7 @@ class TimerApp:
             self.now = datetime.now()
 
             self.current_time = self.now.date()
-            check_last_visit(self.current_time)
+            # check_last_visit(self.current_time)
 
             self.current_hour = self.now.strftime("%H:%M")
 
@@ -100,6 +100,12 @@ class TimerApp:
 
         session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
                        "path/to/screenshots123")
+
+        file_path = "App_Files/time_cash.txt"
+
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
         self.session_time = 0
 
     def temporary_pause_timer(self):
@@ -157,8 +163,14 @@ class TimerApp:
 
             if self.elapsed_time % 10 == 0:  # Check every 10 seconds and save time and DB
                 self.current_time = datetime.now().date()
-                check_last_visit(self.current_time)
-                self.save_time()
+                print("10 seconds passed")
+                with open("App_Files/time_cash.txt", "w") as file:
+                    file.write(
+                        str(self.current_time) + "|" + str(self.email) + "|" + str(self.current_time) + "|" + str(
+                            self.current_hour) + "|" + str(self.session_time) + "|" + "path/to/screenshots123")
+                    print(self.session_time)
+                # check_last_visit(self.current_time)
+                # self.save_time()
 
             self.session_time += 1
 
