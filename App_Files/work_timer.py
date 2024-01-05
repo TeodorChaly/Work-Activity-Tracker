@@ -7,7 +7,7 @@ from pynput import mouse, keyboard
 
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
-from DataBase.db_logs_operations import session_db_add
+from DataBase.db_logs_operations import session_db_add, get_time_today
 from Time_Activity.time_checker import check_last_visit
 from DataBase.db_time_writing import db_time_write, get_time_from_db
 from Settings.app_settings import settings_windows
@@ -47,8 +47,18 @@ class TimerApp:
         self.time_remainder = int(load_settings(self, "time_remainder")) * 60
         print(self.screenshot, self.afk_mode, self.time_remainder)
 
+        # Time settings
+        self.now = datetime.now()
+        self.current_hour = self.now.strftime("%H:%M")
+
+        self.current_time = self.now.date()
+        check_last_visit(self.current_time)
+
+        self.session_time = 0
+
+        # General settings
         self.running = False
-        self.elapsed_time = get_time_from_db(email)
+        self.elapsed_time = get_time_today(self.email, self.current_time) #  "2024-01-02" self.current_time
         self.time_last_break = 0
         self.next_notification_time = self.time_remainder
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -62,14 +72,6 @@ class TimerApp:
         keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
         mouse_listener.start()
         keyboard_listener.start()
-
-        self.now = datetime.now()
-        self.current_hour = self.now.strftime("%H:%M")
-
-        self.current_time = self.now.date()
-        check_last_visit(self.current_time)
-
-        self.session_time = 0
 
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
@@ -96,7 +98,8 @@ class TimerApp:
         self.start_button['state'] = tk.NORMAL
         self.pause_button['state'] = tk.DISABLED
 
-        session_db_add(self.email, self.current_time, self.current_hour, self.session_time, "path/to/screenshots")
+        session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
+                       "path/to/screenshots123")
         self.session_time = 0
 
     def temporary_pause_timer(self):
@@ -159,7 +162,8 @@ class TimerApp:
 
             self.session_time += 1
 
-            print(f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: {self.screenshot}")
+            print(
+                f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: {self.screenshot}, Elsapsed time: {self.elapsed_time}")
             self.root.after(1000, self.update_timer)
 
     def setting_button_click(self):

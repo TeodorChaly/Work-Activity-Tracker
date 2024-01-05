@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 def check_last_visit(last_visit_date):
     current_date = load_last_day()
     last_visit_date = last_visit_date
-    print(current_date, last_visit_date)
     days_absent = (current_date - last_visit_date).days
 
     if days_absent == 0:
