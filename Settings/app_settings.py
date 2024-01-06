@@ -18,8 +18,21 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     setting_window.geometry(f"{window_width}x{window_height}+{position_right}+{position_down}")
 
     # Elements
-    label = tk.Label(setting_window, text="Настройки")
-    label.pack(pady=20)
+    label = tk.Label(setting_window, text=f"Settings", font=("Arial", 14))
+    label.pack()
+
+    label_email = tk.Label(setting_window, text=f"{self.email}")
+    label_email.pack(pady=(0, 10))
+
+    def on_mouse_enter(event):
+        event.widget.config(text="Click to change email", fg='blue')
+
+    def on_mouse_leave(event):
+        event.widget.config(fg='black', text=f"{self.email}")
+
+    label_email.bind("<Enter>", on_mouse_enter)
+    label_email.bind("<Leave>", on_mouse_leave)
+    label_email.bind("<Button-1>", on_email_click)
 
     self.screenshot_var = tk.BooleanVar(value=default_screenshot)
     screenshot_checkbutton = tk.Checkbutton(setting_window, text="Screenshot", variable=self.screenshot_var)
@@ -39,12 +52,15 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
 
     enter_button = tk.Button(setting_window, text="Enter",
                              command=lambda: apply(setting_window, self))
-    enter_button.pack()
+    enter_button.pack(pady=(5, 5))
 
     setting_window.grab_set()
+
+
+def on_email_click(event):
+    print("Email label was clicked")
 
 
 def apply(setting_window, self):
     save_settings(self)
     setting_window.destroy()
-

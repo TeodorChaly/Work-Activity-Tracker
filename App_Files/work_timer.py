@@ -29,8 +29,8 @@ class TimerApp:
         self.setting_button = tk.Button(top_frame, text="Settings", command=self.setting_button_click)
         self.setting_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
-        self.email_label = tk.Label(root, text=email, font=("Arial", 10))
-        self.email_label.pack()
+        # self.email_label = tk.Label(root, text=email, font=("Arial", 10))
+        # self.email_label.pack()
 
         self.time_label = tk.Label(root, text="00:00:00", font=("Arial", 30))
         self.time_label.pack()
@@ -121,7 +121,7 @@ class TimerApp:
 
     def wait_for_activity_to_resume_timer(self):
         if not self.afk_detector.is_afk():
-            print(f"You have been offline {self.aft_timer}")
+            PopupNotification(self.root, f"Welcome back!\n You have been offline for {self.aft_timer}", 2).show()
             self.aft_timer = 0
             self.start_timer()
             self.now = datetime.now()
@@ -151,31 +151,30 @@ class TimerApp:
             # if self.elapsed_time - self.time_last_break >= TIME_REMAINDER:
             #     PopupNotification(self.root, "It is time for little break!").show()
             #     self.time_last_break = self.elapsed_time
-
             if self.afk_detector.is_afk():
+                PopupNotification(self.root, "You are AFK.", 2).show()  # ?
                 self.temporary_pause_timer()
 
             self.next_notification_time -= 1
             if self.next_notification_time <= 0:
-                PopupNotification(self.root, "Time for a break!").show()
+                PopupNotification(self.root, "Time for a break!", 2).show()
                 print(self.time_remainder)
                 self.next_notification_time = self.time_remainder
 
             if self.elapsed_time % 10 == 0:  # Check every 10 seconds and save time and DB
                 self.current_time = datetime.now().date()
-                print("10 seconds passed")
                 with open("App_Files/time_cash.txt", "w") as file:
                     file.write(
                         str(self.current_time) + "|" + str(self.email) + "|" + str(self.current_time) + "|" + str(
                             self.current_hour) + "|" + str(self.session_time) + "|" + "path/to/screenshots123")
                     print(self.session_time)
-                # check_last_visit(self.current_time)
-                # self.save_time()
 
             self.session_time += 1
 
-            print(
-                f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: {self.screenshot}, Elsapsed time: {self.elapsed_time}")
+            print(self.session_time, self.session_time)
+            # print(
+            #     f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: "
+            #     f"{self.screenshot}, Elsapsed time: {self.elapsed_time}")
             self.root.after(1000, self.update_timer)
 
     def setting_button_click(self):

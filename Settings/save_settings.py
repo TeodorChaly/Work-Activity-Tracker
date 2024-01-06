@@ -1,6 +1,7 @@
 import json
 import os
-
+from pynput import mouse, keyboard
+from App_Files.afk_detektor import AFKDetector
 from DataBase.db_logs_operations import session_db_add
 
 user_path = "Settings/user_settings.json"
@@ -23,6 +24,12 @@ def save_settings(self):
     self.screenshot = screenshot
     self.time_remainder = int(notification)
     self.afk_mode = int(afk)
+    self.afk_detector = AFKDetector(int(self.afk_mode))
+    mouse_listener = mouse.Listener(on_move=self.afk_detector.update_last_action_time,
+                                    on_click=self.afk_detector.update_last_action_time)
+    keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
+    mouse_listener.start()
+    keyboard_listener.start()
     self.next_notification_time = self.time_remainder * 60
 
 
