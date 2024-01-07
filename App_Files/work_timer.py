@@ -1,6 +1,6 @@
 import os
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 from time import strftime, gmtime
 
 import tkinter as tk
@@ -9,7 +9,8 @@ from pynput import mouse, keyboard
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
 from DataBase.db_logs_operations import session_db_add, get_time_today
-from DataBase.db_time_writing import db_time_write, get_time_from_db
+from DataBase.db_time_writing import db_time_write
+from App_Files.images_controller import take_screenshot
 from Settings.app_settings import settings_windows
 from Settings.save_settings import load_settings
 
@@ -73,6 +74,18 @@ class TimerApp:
         mouse_listener.start()
         keyboard_listener.start()
 
+    def random_picture(self):
+        min_val = 1000 * 60 * 15
+        max_val = 1000 * 60 * 25
+        interval = random.randint(min_val, max_val)
+
+        self.root.after(interval, self.screenshot_picture)
+
+    def screenshot_picture(self): # Fix (memory leak)
+        if self.running:
+            take_screenshot()
+            self.random_picture()
+
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -91,6 +104,8 @@ class TimerApp:
             # check_last_visit(self.current_time)
 
             self.current_hour = self.now.strftime("%H:%M")
+
+            self.random_picture()
 
     def pause_timer(self):
         self.save_time()
@@ -147,10 +162,6 @@ class TimerApp:
             time_string = strftime('%H:%M:%S', gmtime(self.elapsed_time))
             self.time_label.config(text=time_string)
 
-            # print(self.elapsed_time - self.time_last_break, TIME_REMAINDER)
-            # if self.elapsed_time - self.time_last_break >= TIME_REMAINDER:
-            #     PopupNotification(self.root, "It is time for little break!").show()
-            #     self.time_last_break = self.elapsed_time
             if self.afk_detector.is_afk():
                 PopupNotification(self.root, "You are AFK.", 2).show()  # ?
                 self.temporary_pause_timer()
