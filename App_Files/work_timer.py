@@ -6,6 +6,7 @@ from time import strftime, gmtime
 import tkinter as tk
 from pynput import mouse, keyboard
 
+from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
 from DataBase.db_logs_operations import session_db_add, get_time_today
@@ -29,6 +30,13 @@ class TimerApp:
 
         self.setting_button = tk.Button(top_frame, text="Settings", command=self.setting_button_click)
         self.setting_button.pack(side=tk.RIGHT, padx=10, pady=10)
+
+        self.link_button = tk.Button(self.root, text="Activity this week", relief="flat",
+                                     command=self.open_second_window_wrapper)
+        self.link_button.pack()
+
+        self.link_button.bind("<Enter>", self.on_enter)
+        self.link_button.bind("<Leave>", self.on_leave)
 
         # self.email_label = tk.Label(root, text=email, font=("Arial", 10))
         # self.email_label.pack()
@@ -74,6 +82,17 @@ class TimerApp:
         mouse_listener.start()
         keyboard_listener.start()
 
+    def on_enter(self, event):
+        self.link_button.config(fg="red")
+
+    def on_leave(self, event):
+        self.link_button.config(fg="black")
+
+    def open_second_window_wrapper(self):
+        # Передача переменных в функцию из другого файла
+        open_second_window(self)
+
+
     def random_picture(self):
         min_val = 1000 * 60 * 15
         max_val = 1000 * 60 * 25
@@ -81,7 +100,7 @@ class TimerApp:
 
         self.root.after(interval, self.screenshot_picture)
 
-    def screenshot_picture(self): # Fix (memory leak)
+    def screenshot_picture(self):  # Fix (memory leak)
         if self.running:
             take_screenshot()
             self.random_picture()

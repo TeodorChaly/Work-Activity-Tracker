@@ -11,7 +11,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
 
     # Middle position
     window_width = 300
-    window_height = 200
+    window_height = 300
     position_right = int(self.root.winfo_x() + (self.root.winfo_width() / 2 - window_width / 2))
     position_down = int(self.root.winfo_y() + (self.root.winfo_height() / 2 - window_height / 2))
 
