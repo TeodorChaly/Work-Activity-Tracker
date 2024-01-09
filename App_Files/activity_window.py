@@ -18,7 +18,8 @@ def aggregate_activity_by_hour(data):
             hour_key = start_time.strftime('%H:00')
             if date_key not in activity_by_date_hour:
                 activity_by_date_hour[date_key] = {}
-            activity_by_date_hour[date_key][hour_key] = activity_by_date_hour[date_key].get(hour_key, 0) + overlap.seconds
+            activity_by_date_hour[date_key][hour_key] = activity_by_date_hour[date_key].get(hour_key,
+                                                                                            0) + overlap.seconds
 
             start_time = next_hour
 
@@ -36,38 +37,52 @@ def open_second_window(self):
     text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     scrollbar.config(command=text_widget.yview)
 
-    # data = db_activity_of_last_days(self)
-    # data.sort(key=lambda x: x[2], reverse=True)
-    #
-    # current_date = None
-    # for item in data:
-    #     # Преобразуем продолжительность в формат ЧЧ:ММ:СС
-    #     duration_formatted = data_formatting(item[3].total_seconds())
-    #     until_formatted = data_formatting(item[3].total_seconds() + item[4])
-    #
-    #     if current_date != item[2]:
-    #         current_date = item[2]
-    #         text_widget.configure(state="normal")
-    #         text_widget.insert("end", f"{current_date}\n", "date")
-    #         text_widget.configure(state="disabled")
-    #
-    #     info_text = f"Duration: {duration_formatted} - {until_formatted} , Number: {item[4]}, Screenshot: {item[5]}\n"
-    #     text_widget.configure(state="normal")
-    #     text_widget.insert("end", info_text)
-    #     text_widget.configure(state="disabled")
+    def on_date_hover(event, date):
+        text_widget.tag_configure(f"hover_{date}", foreground="blue")  # Измените цвет на желаемый
+        text_widget.tag_add(f"hover_{date}", f"date_{date.replace(':', '_').replace('-', '_')}.first",
+                            f"date_{date.replace(':', '_').replace('-', '_')}.last")
+
+    def on_date_leave(event, date):
+        text_widget.tag_configure(f"hover_{date}", foreground="black")  # Верните обычный цвет
+        text_widget.tag_remove(f"hover_{date}", f"date_{date.replace(':', '_').replace('-', '_')}.first",
+                               f"date_{date.replace(':', '_').replace('-', '_')}.last")
 
     raw_data = db_activity_of_last_days(self)
     aggregated_data = aggregate_activity_by_hour(raw_data)
 
+    total_week_seconds = sum(sum(hours.values()) for hours in aggregated_data.values())
+
+    text_widget.configure(state="normal")
+    text_widget.insert("end", f"Total time per week: {data_formatting(total_week_seconds)}\n", "total_week")
+
     for date, hours in sorted(aggregated_data.items(), reverse=True):
         text_widget.configure(state="normal")
-        text_widget.insert("end", f"{date}\n", "date")
+
+        total_day_seconds = sum(hours.values())
+
+        date_tag = f"date_{date.replace(':', '_').replace('-', '_')}"
+        text_widget.tag_bind(date_tag, "<Enter>", lambda e, d=date: on_date_hover(e, d))
+        text_widget.tag_bind(date_tag, "<Leave>", lambda e, d=date: on_date_leave(e, d))
+        text_widget.insert("end",
+                           f"{date} ({divmod(total_day_seconds, 60)[0]} minutes and {divmod(total_day_seconds, 60)[1]}"
+                           f" seconds)\n",
+                           date_tag)
+
+        text_widget.tag_bind(date_tag, "<Button-1>", lambda e, d=date: on_date_click(e, d))
+
         for hour, duration in sorted(hours.items()):
-            info_text = f"  {hour} - {duration} (sec)\n"
+            minutes, seconds = divmod(duration, 60)
+            info_text = f" {hour} - {minutes} minutes and {seconds} seconds\n"
             text_widget.insert("end", info_text)
+
         text_widget.configure(state="disabled")
 
     text_widget.tag_configure("date", font=("Arial", 14, "bold"))
+    text_widget.tag_configure("total_week", font=("Arial", 12, "bold"))
+
+
+def on_date_click(event, date):
+    print(f"Chosen date: {date}")
 
 
 def data_formatting(data):
