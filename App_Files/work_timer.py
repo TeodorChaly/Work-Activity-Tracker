@@ -58,7 +58,7 @@ class TimerApp:
 
         # Time settings
         self.now = datetime.now()
-        self.current_hour = self.now.strftime("%H:%M")
+        self.current_hour = self.now.strftime("%H:%M:%S")
 
         self.current_time = self.now.date()
         # check_last_visit(self.current_time)
@@ -122,7 +122,7 @@ class TimerApp:
             self.current_time = self.now.date()
             # check_last_visit(self.current_time)
 
-            self.current_hour = self.now.strftime("%H:%M")
+            self.current_hour = self.now.strftime("%H:%M:%S")
 
             self.random_picture()
 
@@ -159,7 +159,7 @@ class TimerApp:
             self.aft_timer = 0
             self.start_timer()
             self.now = datetime.now()
-            self.current_hour = self.now.strftime("%H:%M")
+            self.current_hour = self.now.strftime("%H:%M:%S")
         else:
             self.root.after(1000, self.wait_for_activity_to_resume_timer)
             self.aft_timer += 1
