@@ -26,9 +26,15 @@ def aggregate_activity_by_hour(data):
     return activity_by_date_hour
 
 
-def open_second_window(self):
+def creating_second_window(self):
     self.second_window = tk.Toplevel(self.root)
     self.second_window.title("Second Window")
+    open_second_window(self)
+
+
+def open_second_window(self):
+    def close_second_window():
+        self.second_window.destroy()
 
     scrollbar = tk.Scrollbar(self.second_window)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -55,20 +61,30 @@ def open_second_window(self):
     text_widget.configure(state="normal")
     text_widget.insert("end", f"Total time per week: {data_formatting(total_week_seconds)}\n", "total_week")
 
+    row_num = 2
+
     for date, hours in sorted(aggregated_data.items(), reverse=True):
         text_widget.configure(state="normal")
 
         total_day_seconds = sum(hours.values())
 
         date_tag = f"date_{date.replace(':', '_').replace('-', '_')}"
-        text_widget.tag_bind(date_tag, "<Enter>", lambda e, d=date: on_date_hover(e, d))
-        text_widget.tag_bind(date_tag, "<Leave>", lambda e, d=date: on_date_leave(e, d))
+        try:
+            text_widget.tag_bind(date_tag, "<Enter>", lambda e, d=date: on_date_hover(e, d))
+        except Exception as e:
+            print("Next")
+        try:
+            text_widget.tag_bind(date_tag, "<Leave>", lambda e, d=date: on_date_leave(e, d))
+        except Exception as e:
+            print("Next")
+
         text_widget.insert("end",
                            f"{date} ({divmod(total_day_seconds, 60)[0]} minutes and {divmod(total_day_seconds, 60)[1]}"
                            f" seconds)\n",
                            date_tag)
 
-        text_widget.tag_bind(date_tag, "<Button-1>", lambda e, d=date: on_date_click(e, d))
+        text_widget.tag_bind(date_tag, "<Button-1>",
+                             lambda e, d=date: show_date_info(e, d, self.email))
 
         for hour, duration in sorted(hours.items()):
             minutes, seconds = divmod(duration, 60)
@@ -76,13 +92,36 @@ def open_second_window(self):
             text_widget.insert("end", info_text)
 
         text_widget.configure(state="disabled")
+        row_num += 1
 
     text_widget.tag_configure("date", font=("Arial", 14, "bold"))
     text_widget.tag_configure("total_week", font=("Arial", 12, "bold"))
 
+    close_button = tk.Button(self.second_window, text="Close", command=close_second_window, pady=10)
+    close_button.pack()
+    text_widget.window_create(tk.END, window=close_button)
 
-def on_date_click(event, date):
-    print(f"Chosen date: {date}")
+    def show_date_info(event, data, email):
+        text_widget.pack_forget()
+        scrollbar.pack_forget()
+
+        new_layer = tk.Frame(self.second_window)
+
+        date_label = tk.Label(new_layer, text=f"Info about: {data}")
+        date_label.pack()
+
+        new_button = tk.Button(new_layer, text="Back to dates",
+                               command=restore_previous_layer)
+        new_button.pack()
+
+        new_layer.pack()
+
+    def restore_previous_layer():
+        for widget in self.second_window.winfo_children():
+            widget.pack_forget()
+
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        text_widget.pack()
 
 
 def data_formatting(data):
