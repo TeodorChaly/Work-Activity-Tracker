@@ -9,6 +9,7 @@ from pynput import mouse, keyboard
 from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
+from App_Files.play_music import audio_check, audio_download
 from DataBase.db_logs_operations import session_db_add, get_time_today
 from DataBase.db_time_writing import db_time_write
 from App_Files.images_controller import take_screenshot
@@ -43,6 +44,10 @@ class TimerApp:
 
         self.time_label = tk.Label(root, text="00:00:00", font=("Arial", 30))
         self.time_label.pack()
+
+        self.music_button = tk.Button(self.root, text="Music")
+        self.stop_button = tk.Button(self.root, text="Stop", state=tk.DISABLED)
+        self.check_audio()
 
         self.start_button = tk.Button(root, text="GO", command=self.start_timer)
         self.start_button.pack()
@@ -81,6 +86,14 @@ class TimerApp:
         keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
         mouse_listener.start()
         keyboard_listener.start()
+
+    def check_audio(self):
+        if audio_check(self):
+            self.music_button.pack()
+            self.stop_button.pack()
+        else:
+            self.music = tk.Button(self.root, text="music", command=lambda: audio_download(self))
+            self.music.pack()
 
     def on_enter(self, event):
         self.link_button.config(fg="red")
