@@ -6,7 +6,7 @@ from time import strftime, gmtime
 import tkinter as tk
 from pynput import mouse, keyboard
 
-from App_Files.activity_window import open_second_window, creating_second_window
+from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
 from DataBase.db_logs_operations import session_db_add, get_time_today
@@ -89,8 +89,7 @@ class TimerApp:
         self.link_button.config(fg="black")
 
     def open_second_window_wrapper(self):
-        creating_second_window(self)
-
+        open_second_window(self)
 
     def random_picture(self):
         min_val = 1000 * 60 * 15

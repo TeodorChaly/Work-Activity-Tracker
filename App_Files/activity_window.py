@@ -1,6 +1,7 @@
 import tkinter as tk
 from datetime import datetime, timedelta
 from DataBase.db_connection import create_db_connection
+from collections import defaultdict
 
 
 def aggregate_activity_by_hour(data):
@@ -26,15 +27,9 @@ def aggregate_activity_by_hour(data):
     return activity_by_date_hour
 
 
-def creating_second_window(self):
+def open_second_window(self):
     self.second_window = tk.Toplevel(self.root)
     self.second_window.title("Second Window")
-    open_second_window(self)
-
-
-def open_second_window(self):
-    def close_second_window():
-        self.second_window.destroy()
 
     scrollbar = tk.Scrollbar(self.second_window)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -97,7 +92,7 @@ def open_second_window(self):
     text_widget.tag_configure("date", font=("Arial", 14, "bold"))
     text_widget.tag_configure("total_week", font=("Arial", 12, "bold"))
 
-    close_button = tk.Button(self.second_window, text="Close", command=close_second_window, pady=10)
+    close_button = tk.Button(self.second_window, text="Close", command=self.second_window.destroy, pady=10)
     close_button.pack()
     text_widget.window_create(tk.END, window=close_button)
 
@@ -105,16 +100,41 @@ def open_second_window(self):
         text_widget.pack_forget()
         scrollbar.pack_forget()
 
+        result = day_info_db(data, email)
+        activity_data = remake(result)
+
+        # GUI
         new_layer = tk.Frame(self.second_window)
 
         date_label = tk.Label(new_layer, text=f"Info about: {data}")
         date_label.pack()
-
-        new_button = tk.Button(new_layer, text="Back to dates",
-                               command=restore_previous_layer)
-        new_button.pack()
-
         new_layer.pack()
+
+        total_seconds_per_day = sum(data["total_seconds"] for data in activity_data.values())
+        total_time_per_day_label = tk.Label(self.second_window,
+                                            text=f"Total time per day: {data_formatting(total_seconds_per_day)}")
+        total_time_per_day_label.pack()
+
+        for hour, data in activity_data.items():
+            total_time_seconds = data["total_seconds"]
+            total_time_label = tk.Label(self.second_window,
+                                        text=f"Hour: {hour.strftime('%H:%M:%S')} -"
+                                             f" Total time: {data_formatting(total_time_seconds)}")
+            total_time_label.pack()
+
+            screenshots = data["screenshots"]
+            if screenshots:
+                if None not in screenshots:
+                    screenshot_label = tk.Label(self.second_window,
+                                                text=f"Screenshots: {screenshots}")
+                    screenshot_label.pack()
+                else:
+                    screenshot_label = tk.Label(self.second_window,
+                                                text=f"Screenshots: No")
+                    screenshot_label.pack()
+
+        new_button = tk.Button(self.second_window, text="Back to dates", command=restore_previous_layer)
+        new_button.pack()
 
     def restore_previous_layer():
         for widget in self.second_window.winfo_children():
@@ -122,6 +142,30 @@ def open_second_window(self):
 
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         text_widget.pack()
+
+
+def remake(data):
+    activity_by_hour = {}
+
+    for item in data:
+        start_time = datetime.combine(item[2], datetime.min.time()) + item[3]
+        end_time = start_time + timedelta(seconds=item[4])
+
+        while start_time < end_time:
+            rounded_hour = start_time.replace(minute=0, second=0)
+            next_hour = rounded_hour + timedelta(hours=1)
+
+            overlap_seconds = (min(end_time, next_hour) - start_time).total_seconds()
+
+            if rounded_hour not in activity_by_hour:
+                activity_by_hour[rounded_hour] = {"total_seconds": 0, "screenshots": []}
+
+            activity_by_hour[rounded_hour]["total_seconds"] += overlap_seconds
+            activity_by_hour[rounded_hour]["screenshots"].extend(item[5:])
+
+            start_time = next_hour
+
+    return activity_by_hour
 
 
 def data_formatting(data):
@@ -158,6 +202,35 @@ def db_activity_of_last_days(self):
 
     results = cursor.fetchall()
 
+    cursor.close()
+    connection.close()
+
+    return results
+
+
+def day_info_db(date, email):
+    connection = create_db_connection()
+
+    query = "SELECT id FROM users WHERE email = %s;"
+    cursor = connection.cursor()
+    cursor.execute(query, (email,))
+    user_id = cursor.fetchone()
+
+    if user_id:
+        user_id = user_id[0]
+    else:
+        print("User not found")
+
+    cursor = connection.cursor()
+
+    query = """
+        SELECT * FROM logs_table
+        WHERE user_id = %s AND data = %s
+        ORDER BY start_time ASC
+        """
+    cursor.execute(query, (user_id, date))
+
+    results = cursor.fetchall()
     cursor.close()
     connection.close()
 
