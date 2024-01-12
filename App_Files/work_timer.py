@@ -9,7 +9,7 @@ from pynput import mouse, keyboard
 from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
-from App_Files.play_music import audio_check, audio_download
+from App_Files.play_music import audio_check, audio_download, play_music_switcher
 from DataBase.db_logs_operations import session_db_add, get_time_today
 from DataBase.db_time_writing import db_time_write
 from App_Files.images_controller import take_screenshot
@@ -41,13 +41,10 @@ class TimerApp:
 
         # self.email_label = tk.Label(root, text=email, font=("Arial", 10))
         # self.email_label.pack()
+        self.check_audio()
 
         self.time_label = tk.Label(root, text="00:00:00", font=("Arial", 30))
         self.time_label.pack()
-
-        self.music_button = tk.Button(self.root, text="Music")
-        self.stop_button = tk.Button(self.root, text="Stop", state=tk.DISABLED)
-        self.check_audio()
 
         self.start_button = tk.Button(root, text="GO", command=self.start_timer)
         self.start_button.pack()
@@ -89,10 +86,16 @@ class TimerApp:
 
     def check_audio(self):
         if audio_check(self):
-            self.music_button.pack()
-            self.stop_button.pack()
+            self.music = tk.Label(self.root, text="Play", fg="black", cursor="hand2")
+            self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
+            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="blue"))
+            self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="black"))
+            self.music.pack()
         else:
-            self.music = tk.Button(self.root, text="music", command=lambda: audio_download(self))
+            self.music = tk.Label(self.root, text="music", fg="black", cursor="hand2")
+            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="blue"))
+            self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="black"))
+            self.music.bind("<Button-1>", lambda event: audio_download(self))
             self.music.pack()
 
     def on_enter(self, event):

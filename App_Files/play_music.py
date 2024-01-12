@@ -4,7 +4,7 @@ from pytube import YouTube
 import os
 
 
-def download_audio(video_url, self):
+def download_audio(video_url, self, second_window):
     try:
         yt = YouTube(video_url)
 
@@ -14,10 +14,24 @@ def download_audio(video_url, self):
 
         print("Music saved")
 
-        self.music.destroy()
+        second_window.destroy()
+        self.music.config(text="Play")
+        self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
 
     except Exception as e:
-        print("Error: ")
+        print("Error: ", e)
+
+
+def play_music_switcher(self):
+    print("Play music")
+    self.music.config(text="Stop")
+    self.music.bind("<Button-1>", lambda event: stop_music_switcher(self))
+
+
+def stop_music_switcher(self):
+    print("Stop music")
+    self.music.config(text="Play")
+    self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
 
 
 def audio_check(self):
@@ -38,7 +52,8 @@ def audio_download(self):
     url_entry = tk.Entry(second_window, width=40)
     url_entry.pack()
 
-    download_button = tk.Button(second_window, text="Save audio", command=lambda: download_audio(url_entry.get(), self))
+    download_button = tk.Button(second_window, text="Save audio",
+                                command=lambda: download_audio(url_entry.get(), self, second_window))
     download_button.pack()
 
     status_label = tk.Label(second_window, text="")
