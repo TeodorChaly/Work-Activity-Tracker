@@ -1,7 +1,9 @@
-import tkinter as tk
-from tkinter import messagebox
-from pytube import YouTube
 import os
+import threading
+import tkinter as tk
+
+import pyglet.resource
+from pytube import YouTube
 
 
 def download_audio(video_url, self, second_window):
@@ -23,15 +25,25 @@ def download_audio(video_url, self, second_window):
 
 
 def play_music_switcher(self):
-    print("Play music")
-    self.music.config(text="Stop")
-    self.music.bind("<Button-1>", lambda event: stop_music_switcher(self))
-
-
-def stop_music_switcher(self):
-    print("Stop music")
-    self.music.config(text="Play")
-    self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
+    if self.music_player is None:
+        print("Play music")
+        self.music.config(text="Stop")
+        self.music_player = pyglet.media.Player()
+        self.music_player.queue(pyglet.resource.media("audio.mp3"))
+        self.music_player.volume = 0.01
+        self.music_player.seek(self.position)
+        self.music_player.play()
+        self.check_playback()
+    else:
+        if self.music_player.playing:
+            print("Stop music")
+            self.position = self.music_player.time
+            self.music_player.pause()
+            self.music.config(text="Play")
+        else:
+            print("Resume music")
+            self.music.config(text="Stop")
+            self.music_player.play()
 
 
 def audio_check(self):

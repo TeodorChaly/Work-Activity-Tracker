@@ -1,9 +1,12 @@
+import asyncio
 import os
 import random
 from datetime import datetime
 from time import strftime, gmtime
 
 import tkinter as tk
+
+import pyglet
 from pynput import mouse, keyboard
 
 from App_Files.activity_window import open_second_window
@@ -52,6 +55,8 @@ class TimerApp:
         self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer, state=tk.DISABLED)
         self.pause_button.pack()
 
+
+
         # Customize settings
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
@@ -83,6 +88,18 @@ class TimerApp:
         keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
         mouse_listener.start()
         keyboard_listener.start()
+
+        self.music_player = None
+        self.position = 0
+
+    def check_playback(self):
+        if self.music_player is not None:
+            if self.music_player.time >= self.music_player.source.duration:
+                print("End of song, playing again")
+                self.position = 0
+                self.music_player.seek(self.position)
+                self.music_player.play()
+        self.root.after(100, self.check_playback)
 
     def check_audio(self):
         if audio_check(self):
