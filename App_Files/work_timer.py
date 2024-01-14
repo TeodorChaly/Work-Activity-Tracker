@@ -55,8 +55,6 @@ class TimerApp:
         self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer, state=tk.DISABLED)
         self.pause_button.pack()
 
-
-
         # Customize settings
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
@@ -128,12 +126,26 @@ class TimerApp:
         min_val = 1000 * 60 * 15
         max_val = 1000 * 60 * 25
         interval = random.randint(min_val, max_val)
-
         self.root.after(interval, self.screenshot_picture)
 
     def screenshot_picture(self):  # Fix (memory leak)
         if self.running:
-            take_screenshot()
+            screenshot_path = take_screenshot()
+
+            session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
+                           screenshot_path)
+
+            file_path = "App_Files/time_cash.txt"
+
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+            self.session_time = 0
+
+            self.now = datetime.now()
+            self.current_time = self.now.date()
+
+            self.current_hour = self.now.strftime("%H:%M:%S")
             self.random_picture()
 
     def save_time(self):
@@ -164,7 +176,7 @@ class TimerApp:
         self.pause_button['state'] = tk.DISABLED
 
         session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
-                       "path/to/screenshots123")
+                       "None")
 
         file_path = "App_Files/time_cash.txt"
 
@@ -222,12 +234,12 @@ class TimerApp:
                 print(self.time_remainder)
                 self.next_notification_time = self.time_remainder
 
-            if self.elapsed_time % 10 == 0:  # Check every 10 seconds and save time and DB
+            if self.elapsed_time % 1 == 0:  # Check every 10 seconds and save time and DB
                 self.current_time = datetime.now().date()
                 with open("App_Files/time_cash.txt", "w") as file:
                     file.write(
                         str(self.current_time) + "|" + str(self.email) + "|" + str(self.current_time) + "|" + str(
-                            self.current_hour) + "|" + str(self.session_time) + "|" + "path/to/screenshots123")
+                            self.current_hour) + "|" + str(self.session_time) + "|" + "None")
                     print(self.session_time)
 
             self.session_time += 1

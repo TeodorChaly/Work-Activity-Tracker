@@ -14,4 +14,4 @@ def take_screenshot(): # Only one monitor
     screenshot = pyautogui.screenshot()
     screenshot.save(filename)
 
-    print(f"Screenshot saved as {filename}")
+    return filename

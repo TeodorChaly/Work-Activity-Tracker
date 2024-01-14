@@ -1,5 +1,8 @@
 import tkinter as tk
 from datetime import datetime, timedelta
+
+from PIL import Image, ImageTk
+
 from DataBase.db_connection import create_db_connection
 from collections import defaultdict
 
@@ -96,6 +99,8 @@ def open_second_window(self):
     close_button.pack()
     text_widget.window_create(tk.END, window=close_button)
 
+    text_widget.config(state="disabled")
+
     def show_date_info(event, data, email):
         text_widget.pack_forget()
         scrollbar.pack_forget()
@@ -114,7 +119,7 @@ def open_second_window(self):
         total_time_per_day_label = tk.Label(self.second_window,
                                             text=f"Total time per day: {data_formatting(total_seconds_per_day)}")
         total_time_per_day_label.pack()
-
+        screenshots = []
         for hour, data in activity_data.items():
             total_time_seconds = data["total_seconds"]
             total_time_label = tk.Label(self.second_window,
@@ -122,16 +127,45 @@ def open_second_window(self):
                                              f" Total time: {data_formatting(total_time_seconds)}")
             total_time_label.pack()
 
-            screenshots = data["screenshots"]
+            for i in data["screenshots"]:
+                if i not in screenshots and i is not None:
+                    if i != "path/to/screenshots123" and i != "None":
+                        screenshots.append(i)
+
             if screenshots:
-                if None not in screenshots:
-                    screenshot_label = tk.Label(self.second_window,
-                                                text=f"Screenshots: {screenshots}")
-                    screenshot_label.pack()
-                else:
-                    screenshot_label = tk.Label(self.second_window,
-                                                text=f"Screenshots: No")
-                    screenshot_label.pack()
+                screenshot_label = tk.Label(self.second_window,
+                                            text=f"Screenshots:")
+                screenshot_label.pack()
+
+                screenshot_frame = tk.Frame(self.second_window)
+                screenshot_frame.pack()
+                # Отображаем до 3 скриншотов в каждой строке
+                for i in range(0, len(screenshots), 3):
+                    screenshot_row = screenshots[i:i + 3]
+                    screenshot_frame = tk.Frame(self.second_window)
+                    screenshot_frame.pack()
+
+                    for screenshot_data in screenshot_row:
+                        if screenshot_data:
+                            try:
+                                image = Image.open(screenshot_data)
+                                image.thumbnail((400, 400))  # Замените размеры на свои
+                                tk_image = ImageTk.PhotoImage(image)
+
+                                screenshot_img_label = tk.Label(screenshot_frame, image=tk_image)
+                                screenshot_img_label.image = tk_image
+                                screenshot_img_label.pack(side=tk.LEFT, padx=5)
+                            except Exception as e:
+                                pass
+                        else:
+                            # Если скриншот отсутствует, отображаем текст "No screenshot"
+                            no_screenshot_label = tk.Label(screenshot_frame, text="No screenshot")
+                            no_screenshot_label.pack(side=tk.LEFT, padx=5)
+
+            else:
+                screenshot_label = tk.Label(self.second_window,
+                                            text=f"Screenshots: No")
+                screenshot_label.pack()
 
         new_button = tk.Button(self.second_window, text="Back to dates", command=restore_previous_layer)
         new_button.pack()
