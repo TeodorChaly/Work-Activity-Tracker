@@ -1,3 +1,4 @@
+import re
 import tkinter as tk
 from datetime import datetime, timedelta
 
@@ -34,20 +35,24 @@ def open_second_window(self):
     self.second_window = tk.Toplevel(self.root)
     self.second_window.title("Second Window")
 
-    scrollbar = tk.Scrollbar(self.second_window)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    screen_width = self.second_window.winfo_screenwidth()
+    screen_height = self.second_window.winfo_screenheight()
+    window_width = int(screen_width * 0.25)
+    window_height = int(screen_height * 0.5)
+    self.second_window.geometry(f"{window_width}x{window_height}")
 
-    text_widget = tk.Text(self.second_window, wrap="word", yscrollcommand=scrollbar.set, state="disabled")
+    self.second_window.resizable(False, False)
+
+    text_widget = tk.Text(self.second_window, wrap="word", state="disabled")
     text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-    scrollbar.config(command=text_widget.yview)
 
     def on_date_hover(event, date):
-        text_widget.tag_configure(f"hover_{date}", foreground="blue")  # Измените цвет на желаемый
+        text_widget.tag_configure(f"hover_{date}", foreground="blue")
         text_widget.tag_add(f"hover_{date}", f"date_{date.replace(':', '_').replace('-', '_')}.first",
                             f"date_{date.replace(':', '_').replace('-', '_')}.last")
 
     def on_date_leave(event, date):
-        text_widget.tag_configure(f"hover_{date}", foreground="black")  # Верните обычный цвет
+        text_widget.tag_configure(f"hover_{date}", foreground="black")
         text_widget.tag_remove(f"hover_{date}", f"date_{date.replace(':', '_').replace('-', '_')}.first",
                                f"date_{date.replace(':', '_').replace('-', '_')}.last")
 
@@ -103,26 +108,48 @@ def open_second_window(self):
 
     def show_date_info(event, data, email):
         text_widget.pack_forget()
-        scrollbar.pack_forget()
+
+        screen_width = self.second_window.winfo_screenwidth()
+        screen_height = self.second_window.winfo_screenheight()
+        window_width = int(screen_width * 0.75)
+        window_height = int(screen_height * 0.75)
+
+        x = (screen_width // 2) - (window_width // 2)
+        y = 0
+
+        size_x = window_width
+        size_y = window_height
+
+        self.second_window.geometry(f"{size_x}x{size_y}+{x}+{y}")
+        self.second_window.title("Second Window")
 
         result = day_info_db(data, email)
         activity_data = remake(result)
 
-        # GUI
-        new_layer = tk.Frame(self.second_window)
+        canvas = tk.Canvas(self.second_window)
+        scrollbar = tk.Scrollbar(self.second_window, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas)
 
-        date_label = tk.Label(new_layer, text=f"Info about: {data}")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        def _configure_canvas(event):
+            canvas_width = event.width
+            canvas.itemconfig(frame_id, width=canvas_width)
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        canvas.bind('<Configure>', _configure_canvas)
+
+        frame_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="n")
+
+        date_label = tk.Label(scrollable_frame, text=f"Info about: {data}")
         date_label.pack()
-        new_layer.pack()
 
-        total_seconds_per_day = sum(data["total_seconds"] for data in activity_data.values())
-        total_time_per_day_label = tk.Label(self.second_window,
-                                            text=f"Total time per day: {data_formatting(total_seconds_per_day)}")
-        total_time_per_day_label.pack()
+        canvas.pack(side="bottom", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
         screenshots = []
         for hour, data in activity_data.items():
             total_time_seconds = data["total_seconds"]
-            total_time_label = tk.Label(self.second_window,
+            total_time_label = tk.Label(scrollable_frame,
                                         text=f"Hour: {hour.strftime('%H:%M:%S')} -"
                                              f" Total time: {data_formatting(total_time_seconds)}")
             total_time_label.pack()
@@ -133,48 +160,69 @@ def open_second_window(self):
                         screenshots.append(i)
 
             if screenshots:
-                screenshot_label = tk.Label(self.second_window,
+                screenshot_label = tk.Label(scrollable_frame,
                                             text=f"Screenshots:")
                 screenshot_label.pack()
 
-                screenshot_frame = tk.Frame(self.second_window)
+                print(screenshots)
+
+                screenshot_frame = tk.Frame(scrollable_frame)
                 screenshot_frame.pack()
-                # Отображаем до 3 скриншотов в каждой строке
                 for i in range(0, len(screenshots), 3):
                     screenshot_row = screenshots[i:i + 3]
-                    screenshot_frame = tk.Frame(self.second_window)
+                    screenshot_frame = tk.Frame(scrollable_frame)
                     screenshot_frame.pack()
 
                     for screenshot_data in screenshot_row:
-                        if screenshot_data:
-                            try:
-                                image = Image.open(screenshot_data)
-                                image.thumbnail((400, 400))  # Замените размеры на свои
-                                tk_image = ImageTk.PhotoImage(image)
 
-                                screenshot_img_label = tk.Label(screenshot_frame, image=tk_image)
-                                screenshot_img_label.image = tk_image
-                                screenshot_img_label.pack(side=tk.LEFT, padx=5)
-                            except Exception as e:
-                                pass
+                        time_match = re.search(r'_(\d{2})(\d{2})\.png$', screenshot_data)
+                        if time_match:
+                            hour_img, minute_img = time_match.groups()
+                            extracted_time = f"{hour_img}"
                         else:
-                            # Если скриншот отсутствует, отображаем текст "No screenshot"
+                            extracted_time = "Time not found"
+
+                        if screenshot_data:
+                            if str(hour.strftime('%H')) == extracted_time:
+                                try:
+                                    image = Image.open(screenshot_data)
+                                    image.thumbnail((400, 400))
+                                    tk_image = ImageTk.PhotoImage(image)
+
+                                    screenshot_img_label = tk.Label(screenshot_frame, image=tk_image)
+                                    screenshot_img_label.image = tk_image
+                                    screenshot_img_label.pack(side=tk.LEFT, padx=5)
+                                except Exception as e:
+                                    pass
+                        else:
                             no_screenshot_label = tk.Label(screenshot_frame, text="No screenshot")
                             no_screenshot_label.pack(side=tk.LEFT, padx=5)
 
             else:
-                screenshot_label = tk.Label(self.second_window,
+                screenshot_label = tk.Label(scrollable_frame,
                                             text=f"Screenshots: No")
                 screenshot_label.pack()
 
-        new_button = tk.Button(self.second_window, text="Back to dates", command=restore_previous_layer)
-        new_button.pack()
+        new_button = tk.Button(scrollable_frame, text="Back to dates", command=restore_previous_layer)
+        new_button.pack(anchor='n', expand=True)
+
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        self.second_window.bind_all("<MouseWheel>", _on_mousewheel)
+        self.second_window.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
 
     def restore_previous_layer():
+        screen_width = self.second_window.winfo_screenwidth()
+        screen_height = self.second_window.winfo_screenheight()
+        window_width = int(screen_width * 0.25)
+        window_height = int(screen_height * 0.5)
+        self.second_window.geometry(f"{window_width}x{window_height}")
+
         for widget in self.second_window.winfo_children():
             widget.pack_forget()
 
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         text_widget.pack()
 
 
