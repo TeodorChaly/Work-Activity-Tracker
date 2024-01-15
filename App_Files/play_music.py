@@ -1,7 +1,6 @@
 import os
-import threading
-import tkinter as tk
 
+import tkinter as tk
 import pyglet.resource
 from pytube import YouTube
 

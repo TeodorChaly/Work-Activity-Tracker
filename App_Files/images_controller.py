@@ -1,7 +1,8 @@
-import pyautogui
-from datetime import datetime
 import os
 
+import pyautogui
+
+from datetime import datetime
 
 def take_screenshot(): # Only one monitor
     folder = 'Images'

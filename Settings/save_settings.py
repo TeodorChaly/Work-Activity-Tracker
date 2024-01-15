@@ -1,6 +1,8 @@
 import json
 import os
+
 from pynput import mouse, keyboard
+
 from App_Files.afk_detektor import AFKDetector
 from DataBase.db_logs_operations import session_db_add
 

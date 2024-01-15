@@ -1,6 +1,8 @@
+import bcrypt
+
 from mysql.connector import Error
 from DataBase.db_connection import create_db_connection
-import bcrypt
+
 
 
 def hash_password(password):

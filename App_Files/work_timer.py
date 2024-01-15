@@ -42,8 +42,6 @@ class TimerApp:
         self.link_button.bind("<Enter>", self.on_enter)
         self.link_button.bind("<Leave>", self.on_leave)
 
-        # self.email_label = tk.Label(root, text=email, font=("Arial", 10))
-        # self.email_label.pack()
         self.check_audio()
 
         self.time_label = tk.Label(root, text="00:00:00", font=("Arial", 30))
@@ -59,20 +57,18 @@ class TimerApp:
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
         self.time_remainder = int(load_settings(self, "time_remainder")) * 60
-        # print(self.screenshot, self.afk_mode, self.time_remainder)
 
         # Time settings
         self.now = datetime.now()
         self.current_hour = self.now.strftime("%H:%M:%S")
 
         self.current_time = self.now.date()
-        # check_last_visit(self.current_time)
 
         self.session_time = 0
 
         # General settings
         self.running = False
-        self.elapsed_time = get_time_today(self.email, self.current_time)  # "2024-01-02" self.current_time
+        self.elapsed_time = get_time_today(self.email, self.current_time)
         self.time_last_break = 0
         self.next_notification_time = self.time_remainder
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -163,7 +159,6 @@ class TimerApp:
             self.now = datetime.now()
 
             self.current_time = self.now.date()
-            # check_last_visit(self.current_time)
 
             self.current_hour = self.now.strftime("%H:%M:%S")
 
@@ -220,12 +215,11 @@ class TimerApp:
         if self.running:
             self.elapsed_time += 1
             self.display_time()
-            TIME_REMAINDER = 1 * 60  # Change time remainder (random)
             time_string = strftime('%H:%M:%S', gmtime(self.elapsed_time))
             self.time_label.config(text=time_string)
 
             if self.afk_detector.is_afk():
-                PopupNotification(self.root, "You are AFK.", 2).show()  # ?
+                PopupNotification(self.root, "You are AFK.", 2).show()
                 self.temporary_pause_timer()
 
             self.next_notification_time -= 1
@@ -245,16 +239,9 @@ class TimerApp:
             self.session_time += 1
 
             print(self.session_time, self.session_time)
-            # print(
-            #     f"AFK: {self.afk_mode}, Notification: {self.next_notification_time}, Screenshot: "
-            #     f"{self.screenshot}, Elsapsed time: {self.elapsed_time}")
             self.root.after(1000, self.update_timer)
 
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
                          int(load_settings(self, "time_remainder")))
 
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     app = TimerApp(root)
-#     root.mainloop()

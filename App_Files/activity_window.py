@@ -1,11 +1,10 @@
 import re
+
 import tkinter as tk
+from PIL import Image, ImageTk
 from datetime import datetime, timedelta
 
-from PIL import Image, ImageTk
-
 from DataBase.db_connection import create_db_connection
-from collections import defaultdict
 
 
 def aggregate_activity_by_hour(data):
