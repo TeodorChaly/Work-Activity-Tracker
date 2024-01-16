@@ -9,6 +9,7 @@ import tkinter as tk
 import pyglet
 from pynput import mouse, keyboard
 
+from App_Files.GUI import Pop
 from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
 from App_Files.notification import PopupNotification
@@ -165,6 +166,7 @@ class TimerApp:
             self.random_picture()
 
     def pause_timer(self):
+
         self.save_time()
         self.running = False
         self.start_button['state'] = tk.NORMAL
@@ -179,6 +181,8 @@ class TimerApp:
             os.remove(file_path)
 
         self.session_time = 0
+
+        Pop()
 
     def temporary_pause_timer(self):
         self.save_time()
