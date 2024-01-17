@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-class PopupNotification:
+class Pop:
     def __init__(self, root, message, time=2):
         if time == 0:
             self.top = tk.Toplevel(root)

@@ -1,4 +1,3 @@
-import asyncio
 import os
 import random
 from datetime import datetime
@@ -6,13 +5,11 @@ from time import strftime, gmtime
 
 import tkinter as tk
 
-import pyglet
 from pynput import mouse, keyboard
 
-from App_Files.GUI import Pop
+from App_Files.GUI import popup_notification
 from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
-from App_Files.notification import PopupNotification
 from App_Files.play_music import audio_check, audio_download, play_music_switcher
 from DataBase.db_logs_operations import session_db_add, get_time_today
 from DataBase.db_time_writing import db_time_write
@@ -182,7 +179,7 @@ class TimerApp:
 
         self.session_time = 0
 
-        Pop()
+        popup_notification("Time for a break!", 2)
 
     def temporary_pause_timer(self):
         self.save_time()
@@ -197,7 +194,8 @@ class TimerApp:
 
     def wait_for_activity_to_resume_timer(self):
         if not self.afk_detector.is_afk():
-            PopupNotification(self.root, f"Welcome back!\n You have been offline for {self.aft_timer}", 2).show()
+            popup_notification(f"Welcome back!\n You have been offline for {self.aft_timer}", 2)
+
             self.aft_timer = 0
             self.start_timer()
             self.now = datetime.now()
@@ -223,12 +221,14 @@ class TimerApp:
             self.time_label.config(text=time_string)
 
             if self.afk_detector.is_afk():
-                PopupNotification(self.root, "You are AFK.", 2).show()
+                # PopupNotification(self.root, "You are AFK.", 2).show()
+                popup_notification("You are AFK.", 2)
                 self.temporary_pause_timer()
 
             self.next_notification_time -= 1
             if self.next_notification_time <= 0:
-                PopupNotification(self.root, "Time for a break!", 2).show()
+                popup_notification("Time for a break!", 2)
+                # PopupNotification(self.root, "Time for a break!", 2).show()
                 print(self.time_remainder)
                 self.next_notification_time = self.time_remainder
 
@@ -248,4 +248,3 @@ class TimerApp:
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
                          int(load_settings(self, "time_remainder")))
-
