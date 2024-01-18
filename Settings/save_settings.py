@@ -13,11 +13,13 @@ def save_settings(self):
     screenshot = self.screenshot_var.get()
     afk = self.afk_mode_var.get()
     notification = self.time_remainder_var.get()
+    week_goal = self.week_goal_var.get()
 
     settings_data = {
         "screenshot": screenshot,
         "time_remainder": notification,
         "afk_mode": afk,
+        "week_goal": week_goal,
     }
 
     with open(user_path, "w") as file:
@@ -26,6 +28,7 @@ def save_settings(self):
     self.screenshot = screenshot
     self.time_remainder = int(notification)
     self.afk_mode = int(afk)
+    self.week_goal_var = int(week_goal)
     self.afk_detector = AFKDetector(int(self.afk_mode))
     mouse_listener = mouse.Listener(on_move=self.afk_detector.update_last_action_time,
                                     on_click=self.afk_detector.update_last_action_time)
@@ -39,6 +42,7 @@ def load_settings(self, element_to_find):
     try:
         with open(user_path, "r") as file:
             settings_data = json.load(file)
+            print(settings_data)
             result = settings_data[element_to_find]
             return result
     except FileNotFoundError:
@@ -49,7 +53,8 @@ def pre_start_configuration():
     default_settings = {
         "screenshot": True,
         "time_remainder": "5",
-        "afk_mode": "10"
+        "afk_mode": "10",
+        "week_goal": "14",
     }
 
     if not os.path.exists(user_path):

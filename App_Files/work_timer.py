@@ -54,6 +54,7 @@ class TimerApp:
         # Customize settings
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
+        self.week_goal = int(load_settings(self, "week_goal"))
         self.time_remainder = int(load_settings(self, "time_remainder")) * 60
 
         # Time settings
@@ -117,9 +118,10 @@ class TimerApp:
         open_second_window(self)
 
     def random_picture(self):
-        min_val = 1000 * 60 * 15
-        max_val = 1000 * 60 * 25
+        min_val = 1000 * 10 * 60
+        max_val = 1000 * 25 * 60
         interval = random.randint(min_val, max_val)
+
         self.root.after(interval, self.screenshot_picture)
 
     def screenshot_picture(self):  # Fix (memory leak)
@@ -141,6 +143,7 @@ class TimerApp:
 
             self.current_hour = self.now.strftime("%H:%M:%S")
             self.random_picture()
+            popup_notification("Screenshot taken", 2)
 
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
@@ -178,8 +181,6 @@ class TimerApp:
             os.remove(file_path)
 
         self.session_time = 0
-
-        popup_notification("Time for a break!", 2)
 
     def temporary_pause_timer(self):
         self.save_time()
@@ -247,4 +248,6 @@ class TimerApp:
 
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
-                         int(load_settings(self, "time_remainder")))
+                         int(load_settings(self,
+                                           "time_remainder")), int(load_settings(self,
+                                                                                 "week_goal")))  # , int(self, "today_goal"), int(self, "week_goal")
