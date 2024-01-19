@@ -50,27 +50,30 @@ class TimerApp:
         # self.user_info_label = tk.Label(top_frame, text=f"{user_name} {user_surname}", font=("Arial", 10))
         # self.user_info_label.pack(side=tk.LEFT, padx=10, pady=10)
         #
+        custom_font = font.Font(family="Open Sans", size=16, weight="normal")
         self.setting_button = tk.Button(self.root, text="Settings", relief="flat", command=self.setting_button_click,
-                                        bg=background_color, activebackground=background_color)
-        self.setting_button.place(x=300, y=100)
+                                        bg=background_color, activebackground=background_color, font=custom_font,
+                                        fg="gray")
+        self.setting_button.place(x=178, y=60)
+        self.setting_button.bind("<Enter>", lambda event, label=self.setting_button: label.config(fg="black"))
+        self.setting_button.bind("<Leave>", lambda event, label=self.setting_button: label.config(fg="gray"))
 
-        self.setting_button.bind("<Enter>", lambda event, label=self.setting_button: label.config(fg="red"))
-        self.setting_button.bind("<Leave>", lambda event, label=self.setting_button: label.config(fg="black"))
-
+        custom_font = font.Font(family="Open Sans", size=14, weight="normal")
         self.link_button = tk.Button(self.root, text="Activity", relief="flat",
                                      command=self.open_second_window_wrapper, bg=background_color,
-                                     activebackground=background_color)
-        self.link_button.place(x=100, y=100)
-
-        self.link_button.bind("<Enter>", lambda event, label=self.link_button: label.config(fg="red"))
-        self.link_button.bind("<Leave>", lambda event, label=self.link_button: label.config(fg="black"))
+                                     activebackground=background_color, fg="gray", font=custom_font)
+        self.link_button.place(x=75, y=125)
+        self.link_button.bind("<Enter>", lambda event, label=self.link_button: label.config(fg="black"))
+        self.link_button.bind("<Leave>", lambda event, label=self.link_button: label.config(fg="gray"))
 
         self.check_audio()
 
+        custom_font = font.Font(family="Open Sans", size=14, weight="normal")
+        self.goal_label = tk.Label(root, text="Goal:0/10", font=custom_font, bg=background_color, fg="gray")
+        self.goal_label.place(x=315, y=135)
+
         custom_font = font.Font(family="Open Sans", size=54, weight="normal")
-
         self.time_label = tk.Label(root, text="00:00:00", font=custom_font, bg=background_color)
-
         self.time_label.place(x=36, y=188)
 
         # self.start_button = tk.Button(root, text="GO", command=self.start_timer, bg=background_color,
@@ -83,10 +86,9 @@ class TimerApp:
 
         play_image = Image.open(play_img_path).resize((82, 82))
         pause_image = Image.open(pause_img_path).resize((82, 82))
-
         self.play_img = ImageTk.PhotoImage(play_image)
-        self.pause_img = ImageTk.PhotoImage(pause_image)
 
+        self.pause_img = ImageTk.PhotoImage(pause_image)
         self.start_button = tk.Button(root, image=self.play_img, command=self.start_timer, bg=background_color,
                                       activebackground=background_color, borderwidth=0, highlightthickness=0)
         self.start_button.place(x=150, y=330)
@@ -142,17 +144,21 @@ class TimerApp:
     def check_audio(self):
         background_color = "white"
         if audio_check(self):
-            self.music = tk.Label(self.root, text="Music", fg="black", cursor="hand2")
-            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="red"))
-            self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="black"))
+            custom_font = font.Font(family="Open Sans", size=14, weight="normal")
+            self.music = tk.Label(self.root, text="Music", fg="gray", cursor="hand2", bg=background_color,
+                                  font=custom_font)
+            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="black"))
+            self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="gray"))
             self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
-            self.music.place(x=10, y=20)
+            self.music.place(x=205, y=135)
         else:
-            self.music = tk.Label(self.root, text="Set music", fg="black", cursor="hand2", bg=background_color)
-            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="red"))
-            self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="black"))
+            custom_font = font.Font(family="Open Sans", size=14, weight="normal")
+            self.music = tk.Label(self.root, text="Set music", fg="gray", cursor="hand2", bg=background_color,
+                                  font=custom_font)
+            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="black"))
+            self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="gray"))
             self.music.bind("<Button-1>", lambda event: audio_download(self))
-            self.music.place(x=10, y=20)
+            self.music.place(x=185, y=135)
 
     def open_second_window_wrapper(self):
         open_second_window(self)
