@@ -4,7 +4,8 @@ from datetime import datetime
 from time import strftime, gmtime
 
 import tkinter as tk
-
+from tkinter import font
+from PIL import Image, ImageTk
 from pynput import mouse, keyboard
 
 from App_Files.GUI import popup_notification
@@ -20,36 +21,80 @@ from Settings.save_settings import load_settings
 
 class TimerApp:
     def __init__(self, root, user_name, user_surname, email):
+        background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        big_image_path = background_image_path + "\\App_image\\circle.png"
+        play_img_path = background_image_path + "\\App_image\\play.png"
+        pause_img_path = background_image_path + "\\App_image\\stop.png"
+
+        bg_image = Image.open(big_image_path)
+        bg_resized_image = bg_image.resize(
+            (500, 500))
+        self.bg_image = ImageTk.PhotoImage(bg_resized_image)
+
+        background_label = tk.Label(root, image=self.bg_image)
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
         self.root = root
         self.email = email
         root.title("Timer")
 
-        top_frame = tk.Frame(root)
-        top_frame.pack(side=tk.TOP, fill=tk.X)
+        root.geometry("500x500")
+        root.resizable(False, False)
+        root.configure(bg="white")
 
-        self.user_info_label = tk.Label(top_frame, text=f"{user_name} {user_surname}", font=("Arial", 10))
-        self.user_info_label.pack(side=tk.LEFT, padx=10, pady=10)
+        background_color = "white"
 
-        self.setting_button = tk.Button(top_frame, text="Settings", command=self.setting_button_click)
-        self.setting_button.pack(side=tk.RIGHT, padx=10, pady=10)
+        # top_frame = tk.Frame(root)
+        # top_frame.pack(side=tk.TOP, fill=tk.X)
+        #
+        # self.user_info_label = tk.Label(top_frame, text=f"{user_name} {user_surname}", font=("Arial", 10))
+        # self.user_info_label.pack(side=tk.LEFT, padx=10, pady=10)
+        #
+        self.setting_button = tk.Button(self.root, text="Settings", relief="flat", command=self.setting_button_click,
+                                        bg=background_color, activebackground=background_color)
+        self.setting_button.place(x=300, y=100)
 
-        self.link_button = tk.Button(self.root, text="Activity this week", relief="flat",
-                                     command=self.open_second_window_wrapper)
-        self.link_button.pack()
+        self.setting_button.bind("<Enter>", lambda event, label=self.setting_button: label.config(fg="red"))
+        self.setting_button.bind("<Leave>", lambda event, label=self.setting_button: label.config(fg="black"))
 
-        self.link_button.bind("<Enter>", self.on_enter)
-        self.link_button.bind("<Leave>", self.on_leave)
+        self.link_button = tk.Button(self.root, text="Activity", relief="flat",
+                                     command=self.open_second_window_wrapper, bg=background_color,
+                                     activebackground=background_color)
+        self.link_button.place(x=100, y=100)
+
+        self.link_button.bind("<Enter>", lambda event, label=self.link_button: label.config(fg="red"))
+        self.link_button.bind("<Leave>", lambda event, label=self.link_button: label.config(fg="black"))
 
         self.check_audio()
 
-        self.time_label = tk.Label(root, text="00:00:00", font=("Arial", 30))
-        self.time_label.pack()
+        custom_font = font.Font(family="Open Sans", size=54, weight="normal")
 
-        self.start_button = tk.Button(root, text="GO", command=self.start_timer)
-        self.start_button.pack()
+        self.time_label = tk.Label(root, text="00:00:00", font=custom_font, bg=background_color)
 
-        self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer, state=tk.DISABLED)
-        self.pause_button.pack()
+        self.time_label.place(x=36, y=188)
+
+        # self.start_button = tk.Button(root, text="GO", command=self.start_timer, bg=background_color,
+        #                               activebackground=background_color)
+        # self.start_button.place(x=170, y=100)
+        #
+        # self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer, state=tk.DISABLED,
+        #                               bg=background_color, activebackground=background_color)
+        # self.pause_button.place(x=200, y=100)
+
+        play_image = Image.open(play_img_path).resize((82, 82))
+        pause_image = Image.open(pause_img_path).resize((82, 82))
+
+        self.play_img = ImageTk.PhotoImage(play_image)
+        self.pause_img = ImageTk.PhotoImage(pause_image)
+
+        self.start_button = tk.Button(root, image=self.play_img, command=self.start_timer, bg=background_color,
+                                      activebackground=background_color, borderwidth=0, highlightthickness=0)
+        self.start_button.place(x=150, y=330)
+
+        self.pause_button = tk.Button(root, image=self.pause_img, command=self.pause_timer, state=tk.DISABLED,
+                                      bg=background_color, activebackground=background_color, borderwidth=0,
+                                      highlightthickness=0)
+        self.pause_button.place(x=265, y=330)
 
         # Customize settings
         self.screenshot = load_settings(self, "screenshot")
@@ -95,24 +140,19 @@ class TimerApp:
         self.root.after(100, self.check_playback)
 
     def check_audio(self):
+        background_color = "white"
         if audio_check(self):
-            self.music = tk.Label(self.root, text="Play", fg="black", cursor="hand2")
-            self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
-            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="blue"))
+            self.music = tk.Label(self.root, text="Music", fg="black", cursor="hand2")
+            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="red"))
             self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="black"))
-            self.music.pack()
+            self.music.bind("<Button-1>", lambda event: play_music_switcher(self))
+            self.music.place(x=10, y=20)
         else:
-            self.music = tk.Label(self.root, text="music", fg="black", cursor="hand2")
-            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="blue"))
+            self.music = tk.Label(self.root, text="Set music", fg="black", cursor="hand2", bg=background_color)
+            self.music.bind("<Enter>", lambda event, label=self.music: label.config(fg="red"))
             self.music.bind("<Leave>", lambda event, label=self.music: label.config(fg="black"))
             self.music.bind("<Button-1>", lambda event: audio_download(self))
-            self.music.pack()
-
-    def on_enter(self, event):
-        self.link_button.config(fg="red")
-
-    def on_leave(self, event):
-        self.link_button.config(fg="black")
+            self.music.place(x=10, y=20)
 
     def open_second_window_wrapper(self):
         open_second_window(self)
