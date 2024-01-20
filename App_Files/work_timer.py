@@ -31,8 +31,8 @@ class TimerApp:
             (500, 500))
         self.bg_image = ImageTk.PhotoImage(bg_resized_image)
 
-        background_label = tk.Label(root, image=self.bg_image)
-        background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.background_label = tk.Label(root, image=self.bg_image)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         self.root = root
         self.email = email
@@ -75,7 +75,8 @@ class TimerApp:
         self.check_audio()
 
         custom_font = font.Font(family="Open Sans", size=14, weight="normal")
-        self.goal_label = tk.Label(root, text=f"Goal:0/{self.week_goal}", font=custom_font, bg=background_color, fg="gray")
+        self.goal_label = tk.Label(root, text=f"Goal:0/{self.week_goal}", font=custom_font, bg=background_color,
+                                   fg="gray")
         self.goal_label.place(x=315, y=135)
 
         custom_font = font.Font(family="Open Sans", size=54, weight="normal")
@@ -103,7 +104,6 @@ class TimerApp:
                                       bg=background_color, activebackground=background_color, borderwidth=0,
                                       highlightthickness=0)
         self.pause_button.place(x=265, y=330)
-
 
         # Time settings
         self.now = datetime.now()
@@ -264,6 +264,8 @@ class TimerApp:
 
     def update_timer(self):
         if self.running:
+            self.image_progress_changer()
+
             self.elapsed_time += 1
             self.display_time()
             time_string = strftime('%H:%M:%S', gmtime(self.elapsed_time))
@@ -297,7 +299,71 @@ class TimerApp:
             self.root.after(1000, self.update_timer)
 
     def image_progress_changer(self):
-        pass
+        # week_goal round to int
+        print(self.elapsed_time, self.week_goal)
+        if self.elapsed_time >= self.week_goal:
+            self.change_bg("\\App_image\\Circle\\circle_10.png")
+        if self.elapsed_time == 0:
+            self.change_bg("\\App_image\\Circle\\circle_0.png")
+        # If 1/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 1:
+            self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # If 2/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 2:
+            self.change_bg("\\App_image\\Circle\\circle_2.png")
+        # If 3/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 3:
+            self.change_bg("\\App_image\\Circle\\circle_3.png")
+        # If 4/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 4:
+            self.change_bg("\\App_image\\Circle\\circle_4.png")
+        # If 5/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 5:
+            self.change_bg("\\App_image\\Circle\\circle_5.png")
+        # If 6/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 6:
+            self.change_bg("\\App_image\\Circle\\circle_6.png")
+        # If 7/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 7:
+            self.change_bg("\\App_image\\Circle\\circle_7.png")
+        # If 8/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 8:
+            self.change_bg("\\App_image\\Circle\\circle_8.png")
+        # If 9/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 9:
+            self.change_bg("\\App_image\\Circle\\circle_9.png")
+        # If 10/10 of week_goal
+        if self.elapsed_time // (self.week_goal / 10) == 10:
+            self.change_bg("\\App_image\\Circle\\circle_10.png")
+
+        # if self.elapsed_time // 60 == 0:
+        #     self.change_bg("\\App_image\\Circle\\circle_0.png")
+        # if self.elapsed_time // 60 == 1:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # if self.elapsed_time // 60 == 2:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # if self.elapsed_time // 60 == 3:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # if self.elapsed_time // 60 == 4:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # if self.elapsed_time // 60 == 5:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # if self.elapsed_time // 60 == 6:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+        # if self.elapsed_time // 60 == 7:
+        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
+
+
+    def change_bg(self, path):
+        background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        big_image_path = background_image_path + path
+
+        bg_image = Image.open(big_image_path)
+        bg_resized_image = bg_image.resize(
+            (500, 500))
+        self.bg_image = ImageTk.PhotoImage(bg_resized_image)
+
+        self.background_label.config(image=self.bg_image)
 
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
