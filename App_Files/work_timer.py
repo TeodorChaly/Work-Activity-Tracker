@@ -44,6 +44,12 @@ class TimerApp:
 
         background_color = "white"
 
+        # Customize settings
+        self.screenshot = load_settings(self, "screenshot")
+        self.afk_mode = int(load_settings(self, "afk_mode"))
+        self.week_goal = int(load_settings(self, "week_goal"))
+        self.time_remainder = int(load_settings(self, "time_remainder")) * 60
+
         # top_frame = tk.Frame(root)
         # top_frame.pack(side=tk.TOP, fill=tk.X)
         #
@@ -69,7 +75,7 @@ class TimerApp:
         self.check_audio()
 
         custom_font = font.Font(family="Open Sans", size=14, weight="normal")
-        self.goal_label = tk.Label(root, text="Goal:0/10", font=custom_font, bg=background_color, fg="gray")
+        self.goal_label = tk.Label(root, text=f"Goal:0/{self.week_goal}", font=custom_font, bg=background_color, fg="gray")
         self.goal_label.place(x=315, y=135)
 
         custom_font = font.Font(family="Open Sans", size=54, weight="normal")
@@ -98,11 +104,6 @@ class TimerApp:
                                       highlightthickness=0)
         self.pause_button.place(x=265, y=330)
 
-        # Customize settings
-        self.screenshot = load_settings(self, "screenshot")
-        self.afk_mode = int(load_settings(self, "afk_mode"))
-        self.week_goal = int(load_settings(self, "week_goal"))
-        self.time_remainder = int(load_settings(self, "time_remainder")) * 60
 
         # Time settings
         self.now = datetime.now()
@@ -193,6 +194,7 @@ class TimerApp:
 
     def save_time(self):
         hours, remainder = divmod(self.elapsed_time, 3600)
+        print(hours, remainder)
         minutes, seconds = divmod(remainder, 60)
         db_time_write(hours, minutes, seconds, self.email)
 
@@ -289,8 +291,13 @@ class TimerApp:
 
             self.session_time += 1
 
+            self.goal_label.config(text=f"Goal:{self.elapsed_time}/{self.week_goal}")
+
             print(self.session_time, self.session_time)
             self.root.after(1000, self.update_timer)
+
+    def image_progress_changer(self):
+        pass
 
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),

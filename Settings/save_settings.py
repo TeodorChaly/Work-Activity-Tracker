@@ -28,7 +28,9 @@ def save_settings(self):
     self.screenshot = screenshot
     self.time_remainder = int(notification)
     self.afk_mode = int(afk)
-    self.week_goal_var = int(week_goal)
+    # self.week_goal_var = int(week_goal)
+    self.week_goal = int(week_goal)
+    self.goal_label.config(text=f"Goal:{self.elapsed_time}/{self.week_goal}")
     self.afk_detector = AFKDetector(int(self.afk_mode))
     mouse_listener = mouse.Listener(on_move=self.afk_detector.update_last_action_time,
                                     on_click=self.afk_detector.update_last_action_time)

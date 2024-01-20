@@ -27,6 +27,7 @@ def play_music_switcher(self):
     if self.music_player is None:
         print("Play music")
         self.music.config(text="Stop")
+        self.music.place(x=220, y=135)
         self.music_player = pyglet.media.Player()
         self.music_player.queue(pyglet.resource.media("audio.mp3"))
         self.music_player.volume = 0.01
