@@ -50,6 +50,15 @@ class TimerApp:
         self.week_goal = int(load_settings(self, "week_goal"))
         self.time_remainder = int(load_settings(self, "time_remainder")) * 60
 
+        # Time settings
+        self.now = datetime.now()
+        self.current_hour = self.now.strftime("%H:%M:%S")
+        self.session_time = 0
+        self.current_time = self.now.date()
+        self.elapsed_time = get_time_today(self.email, self.current_time)
+        change = self.week_goal * 60 // 7
+        self.hours, self.remainder = divmod(change, 60)
+
         # top_frame = tk.Frame(root)
         # top_frame.pack(side=tk.TOP, fill=tk.X)
         #
@@ -75,9 +84,12 @@ class TimerApp:
         self.check_audio()
 
         custom_font = font.Font(family="Open Sans", size=14, weight="normal")
-        self.goal_label = tk.Label(root, text=f"Goal:0/{self.week_goal}", font=custom_font, bg=background_color,
+        self.goal_label = tk.Label(root,
+                                   text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}",
+                                   font=custom_font,
+                                   bg=background_color,
                                    fg="gray")
-        self.goal_label.place(x=315, y=135)
+        self.goal_label.place(x=315, y=115)
 
         custom_font = font.Font(family="Open Sans", size=54, weight="normal")
         self.time_label = tk.Label(root, text="00:00:00", font=custom_font, bg=background_color)
@@ -105,17 +117,8 @@ class TimerApp:
                                       highlightthickness=0)
         self.pause_button.place(x=265, y=330)
 
-        # Time settings
-        self.now = datetime.now()
-        self.current_hour = self.now.strftime("%H:%M:%S")
-
-        self.current_time = self.now.date()
-
-        self.session_time = 0
-
         # General settings
         self.running = False
-        self.elapsed_time = get_time_today(self.email, self.current_time)
         self.time_last_break = 0
         self.next_notification_time = self.time_remainder
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -280,7 +283,7 @@ class TimerApp:
             if self.next_notification_time <= 0:
                 popup_notification("Time for a break!", 2)
                 # PopupNotification(self.root, "Time for a break!", 2).show()
-                print(self.time_remainder)
+                # print(self.time_remainder)
                 self.next_notification_time = self.time_remainder
 
             if self.elapsed_time % 1 == 0:  # Check every 10 seconds and save time and DB
@@ -289,70 +292,58 @@ class TimerApp:
                     file.write(
                         str(self.current_time) + "|" + str(self.email) + "|" + str(self.current_time) + "|" + str(
                             self.current_hour) + "|" + str(self.session_time) + "|" + "None")
-                    print(self.session_time)
+                    # print(self.session_time)
 
             self.session_time += 1
 
-            self.goal_label.config(text=f"Goal:{self.elapsed_time}/{self.week_goal}")
+            self.goal_label.config(
+                text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}")
 
-            print(self.session_time, self.session_time)
+            # print(self.session_time, self.session_time)
             self.root.after(1000, self.update_timer)
 
     def image_progress_changer(self):
         # week_goal round to int
-        print(self.elapsed_time, self.week_goal)
-        if self.elapsed_time >= self.week_goal:
+        time_now = self.elapsed_time // 60
+        day_goal = self.hours * 60 + self.remainder
+
+        print(day_goal, time_now, day_goal / 10 )
+
+        if time_now >= day_goal:
             self.change_bg("\\App_image\\Circle\\circle_10.png")
-        if self.elapsed_time == 0:
+            popup_notification("Your reached day's goal!", 2)
+        if time_now // (day_goal / 10) == 0:
             self.change_bg("\\App_image\\Circle\\circle_0.png")
         # If 1/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 1:
+        if time_now // (day_goal / 10) == 1:
             self.change_bg("\\App_image\\Circle\\circle_1.png")
         # If 2/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 2:
+        if time_now // (day_goal / 10) == 2:
             self.change_bg("\\App_image\\Circle\\circle_2.png")
         # If 3/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 3:
+        if time_now // (day_goal / 10) == 3:
             self.change_bg("\\App_image\\Circle\\circle_3.png")
         # If 4/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 4:
+        if time_now // (day_goal / 10) == 4:
             self.change_bg("\\App_image\\Circle\\circle_4.png")
         # If 5/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 5:
+        if time_now // (day_goal / 10) == 5:
             self.change_bg("\\App_image\\Circle\\circle_5.png")
         # If 6/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 6:
+        if time_now // (day_goal / 10) == 6:
             self.change_bg("\\App_image\\Circle\\circle_6.png")
         # If 7/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 7:
+        if time_now // (day_goal / 10) == 7:
             self.change_bg("\\App_image\\Circle\\circle_7.png")
         # If 8/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 8:
+        if time_now // (day_goal / 10) == 8:
             self.change_bg("\\App_image\\Circle\\circle_8.png")
         # If 9/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 9:
+        if time_now // (day_goal / 10) == 9:
             self.change_bg("\\App_image\\Circle\\circle_9.png")
         # If 10/10 of week_goal
-        if self.elapsed_time // (self.week_goal / 10) == 10:
+        if time_now // (day_goal / 10) == 10:
             self.change_bg("\\App_image\\Circle\\circle_10.png")
-
-        # if self.elapsed_time // 60 == 0:
-        #     self.change_bg("\\App_image\\Circle\\circle_0.png")
-        # if self.elapsed_time // 60 == 1:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # if self.elapsed_time // 60 == 2:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # if self.elapsed_time // 60 == 3:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # if self.elapsed_time // 60 == 4:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # if self.elapsed_time // 60 == 5:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # if self.elapsed_time // 60 == 6:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # if self.elapsed_time // 60 == 7:
-        #     self.change_bg("\\App_image\\Circle\\circle_1.png")
-
 
     def change_bg(self, path):
         background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

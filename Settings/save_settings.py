@@ -30,7 +30,7 @@ def save_settings(self):
     self.afk_mode = int(afk)
     # self.week_goal_var = int(week_goal)
     self.week_goal = int(week_goal)
-    self.goal_label.config(text=f"Goal:{self.elapsed_time}/{self.week_goal}")
+
     self.afk_detector = AFKDetector(int(self.afk_mode))
     mouse_listener = mouse.Listener(on_move=self.afk_detector.update_last_action_time,
                                     on_click=self.afk_detector.update_last_action_time)
@@ -38,6 +38,10 @@ def save_settings(self):
     mouse_listener.start()
     keyboard_listener.start()
     self.next_notification_time = self.time_remainder * 60
+    change = self.week_goal * 60 // 7
+    self.hours, self.remainder = divmod(change, 60)
+    self.goal_label.config(
+        text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:}.{self.remainder // 6}")
 
 
 def load_settings(self, element_to_find):
