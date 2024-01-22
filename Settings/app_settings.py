@@ -3,15 +3,18 @@ import tkinter as tk
 
 from PIL import Image, ImageTk
 
+from App_Files.play_music import audio_download, download_audio
 from Settings.save_settings import save_settings
 
 
 def settings_windows(self, default_screenshot, default_afk_mode, default_time_remainder, default_weak_goal):
+    window_width = 300
+    window_height = 550
     background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     big_image_path = background_image_path + "\\App_image\\setting.jpg"
     bg_image = Image.open(big_image_path)
     bg_resized_image = bg_image.resize(
-        (300, 450))
+        (window_width, window_height))
     self.bg_image_set = ImageTk.PhotoImage(bg_resized_image)
 
     print(self.screenshot, self.time_remainder, self.afk_mode, self.week_goal, 1)
@@ -24,14 +27,13 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
                                 activebackground=background_color)
     background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-    # Middle position
-    window_width = 300
-    window_height = 450
     position_right = int(self.root.winfo_x() + (self.root.winfo_width() / 2 - window_width / 2))
     position_down = int(self.root.winfo_y() + (self.root.winfo_height() / 2 - window_height / 2))
 
     setting_window.geometry(f"{window_width}x{window_height}+{position_right}+{position_down}")
     setting_window.resizable(False, False)
+
+    y_height = 50
 
     # Elements
     label_setting = tk.Label(setting_window, text=f"Settings", font=("Arial", 15), bg=background_color,
@@ -42,58 +44,120 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
                            activebackground=background_color)
     label_email.place(x=window_width // 2 - 60, y=50)
 
-    def on_mouse_enter(event):
-        event.widget.config(text="Click to change email", fg='blue')
-        event.widget.place(x=window_width // 2 - 85, y=50)
+    label_music = tk.Label(setting_window, text=f"Change music", bg=background_color,
+                           activebackground=background_color)
+    label_music.place(x=window_width // 2 - 60, y=y_height + 65)
 
-    def on_mouse_leave(event):
-        event.widget.config(fg='black', text=f"{self.email}")
-        event.widget.place(x=window_width // 2 - 60, y=50)
+    # volume_label = tk.Label(setting_window, text="Volume (0-10):")
+    # volume_label.place(x=window_width // 2, y=180)
 
-    label_email.bind("<Enter>", on_mouse_enter)
-    label_email.bind("<Leave>", on_mouse_leave)
+    def on_mouse_enter(event, text, x, y):
+        event.widget.config(text=text, fg='blue')
+        event.widget.place(x=x, y=y)
+
+    def on_mouse_leave(event, text, x, y):
+        event.widget.config(fg='black', text=text)
+        event.widget.place(x=x, y=y)
+
+    label_email.bind("<Enter>",
+                     lambda event: on_mouse_enter(event, "Click to change email", window_width // 2 - 85, 50))
+    label_email.bind("<Leave>", lambda event: on_mouse_leave(event, f"{self.email}", window_width // 2 - 60, 50))
     label_email.bind("<Button-1>", on_email_click)
+
+    label_music.bind("<Enter>",
+                     lambda event: on_mouse_enter(event, "Click to change music", window_width // 2 - 90,
+                                                  y_height + 65))
+    label_music.bind("<Leave>",
+                     lambda event: on_mouse_leave(event, "Change music", window_width // 2 - 60, y_height + 65))
+    label_music.bind("<Button-1>", lambda event: change_music(event, self))
 
     self.screenshot_var = tk.BooleanVar(value=default_screenshot)
     screenshot_checkbutton = tk.Checkbutton(setting_window, text="Screenshot", variable=self.screenshot_var,
                                             bg=background_color,
                                             activebackground=background_color)
-    screenshot_checkbutton.place(x=window_width // 2 - 60, y=100)
+    screenshot_checkbutton.place(x=window_width // 2 - 60, y=y_height + 100)
 
     # Time remainder - Int
-    tk.Label(setting_window, text="Time remainder (minute)", bg=background_color,
-             activebackground=background_color).place(x=window_width // 2 - 100, y=140)
+    self.time_label = tk.Label(setting_window, text="Time remainder (minute)", bg=background_color,
+                          activebackground=background_color)
+    self.time_label.place(x=window_width // 2 - 100, y=y_height + 140)
     self.time_remainder_var = tk.StringVar(value=default_time_remainder)
     time_remainder_entry = tk.Entry(setting_window, textvariable=self.time_remainder_var, bg=background_color)
-    time_remainder_entry.place(x=window_width // 2 - 100, y=170)
+    time_remainder_entry.place(x=window_width // 2 - 100, y=y_height + 170)
 
     # AFK Mode - Int
-    tk.Label(setting_window, text="AFK Mode (minute)", bg=background_color,
-             activebackground=background_color).place(x=window_width // 2 - 75, y=210)
+    self.afk_label = tk.Label(setting_window, text="AFK Mode (minute)", bg=background_color,
+                         activebackground=background_color)
+    self.afk_label.place(x=window_width // 2 - 75, y=y_height + 210)
     self.afk_mode_var = tk.StringVar(value=default_afk_mode)
     afk_mode_entry = tk.Entry(setting_window, textvariable=self.afk_mode_var, bg=background_color)
-    afk_mode_entry.place(x=window_width // 2 - 100, y=240)
+    afk_mode_entry.place(x=window_width // 2 - 100, y=y_height + 240)
 
     # Weak goal - Int
-    tk.Label(setting_window, text="Weak goal (hours)", bg=background_color,
-             activebackground=background_color).place(x=window_width // 2 - 75, y=280)
+    self. weak_label = tk.Label(setting_window, text="Weak goal (hours)", bg=background_color,
+                          activebackground=background_color)
+    self.weak_label.place(x=window_width // 2 - 75, y=y_height + 280)
     self.week_goal_var = tk.StringVar(value=default_weak_goal)
     week_goal_entry = tk.Entry(setting_window, textvariable=self.week_goal_var)
-    week_goal_entry.place(x=window_width // 2 - 100, y=310)
+    week_goal_entry.place(x=window_width // 2 - 100, y=y_height + 310)
+
+    # Volume - Int
+
+    tk.Label(setting_window, text="Volume of music", bg=background_color,
+             activebackground=background_color).place(x=window_width // 2 - 75, y=y_height + 340)
+
+    self.volume_var = tk.DoubleVar()
+    volume_scale = tk.Scale(setting_window, from_=0, to=10, orient='horizontal', variable=self.volume_var,
+                            bg=background_color, activebackground=background_color)
+    volume_scale.place(x=window_width // 2 - 55, y=y_height + 380)
+
+    # Save button
 
     enter_button = tk.Button(setting_window, text="Enter",
                              command=lambda: apply(setting_window, self))
-    enter_button.place(x=window_width // 2 - 30, y=360)
+    enter_button.place(x=window_width // 2 - 30, y=y_height + 440)
+
+    # Error label
 
     self.error_label = tk.Label(setting_window, fg="red", bg=background_color,
                                 activebackground=background_color)
-    self.error_label.place(x=window_width // 2 - 100, y=410)
+    self.error_label.place(x=window_width // 2 - 100, y=y_height + 420)
 
     setting_window.grab_set()
 
 
 def on_email_click(event):
     print("Email label was clicked")
+
+
+def change_music(event, self):
+    second_window = tk.Toplevel(self.root)
+    second_window.title("Choose audio")
+    second_window.grab_set()  # Делает окно модальным
+
+    url_label = tk.Label(second_window, text="Enter link of audio from YouTube:")
+    url_label.pack()
+
+    url_entry = tk.Entry(second_window, width=40)
+    url_entry.pack()
+
+    status_label = tk.Label(second_window, text="")
+    status_label.pack()
+
+    def start_download():
+        url = url_entry.get()
+        download_audio(url, self, second_window)
+        on_close_second_window(second_window)
+
+    download_button = tk.Button(second_window, text="Save audio", command=start_download)
+    download_button.pack()
+
+    second_window.protocol("WM_DELETE_WINDOW", lambda: on_close_second_window(second_window))
+
+
+def on_close_second_window(window):
+    window.grab_release()  # Освобождает блокировку при закрытии окна
+    window.destroy()
 
 
 def is_number(value):
@@ -108,17 +172,16 @@ def apply(setting_window, self):
     error_message = ""
 
     if not is_number(self.time_remainder_var.get()):
-        error_message += "Not correct time remainder\n"
+        self.time_label.config(fg="red")
 
     if not is_number(self.afk_mode_var.get()):
-        error_message += "Not correct AFK mode\n"
+        self.afk_label.config(fg="red")
 
     if not is_number(self.week_goal_var.get()):
-        error_message += "Not correct week goal\n"
+        self.weak_label.config(fg="red")
 
     if error_message:
-        error_message = "" + error_message.rstrip(", ")
-        self.error_label.config(text=error_message)
+        print("Error")
     else:
         self.error_label.config(text="")
         save_settings(self)
