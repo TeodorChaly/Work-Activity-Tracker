@@ -4,6 +4,8 @@ import tkinter as tk
 import pyglet.resource
 from pytube import YouTube
 
+from Settings.save_settings import load_settings
+
 
 def download_audio(video_url, self, second_window):
     try:
@@ -30,7 +32,7 @@ def play_music_switcher(self):
         self.music.place(x=220, y=135)
         self.music_player = pyglet.media.Player()
         self.music_player.queue(pyglet.resource.media("audio.mp3"))
-        self.music_player.volume = 0.01
+        self.music_player.volume = int(load_settings(self, "week_goal"))/10
         self.music_player.seek(self.position)
         self.music_player.play()
         self.check_playback()

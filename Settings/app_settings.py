@@ -78,9 +78,9 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     screenshot_checkbutton.place(x=window_width // 2 - 60, y=y_height + 100)
 
     # Time remainder - Int
-    self.time_label = tk.Label(setting_window, text="Time remainder (minute)", bg=background_color,
+    self.time_label_remainder = tk.Label(setting_window, text="Time remainder (minute)", bg=background_color,
                           activebackground=background_color)
-    self.time_label.place(x=window_width // 2 - 100, y=y_height + 140)
+    self.time_label_remainder.place(x=window_width // 2 - 100, y=y_height + 140)
     self.time_remainder_var = tk.StringVar(value=default_time_remainder)
     time_remainder_entry = tk.Entry(setting_window, textvariable=self.time_remainder_var, bg=background_color)
     time_remainder_entry.place(x=window_width // 2 - 100, y=y_height + 170)
@@ -94,7 +94,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     afk_mode_entry.place(x=window_width // 2 - 100, y=y_height + 240)
 
     # Weak goal - Int
-    self. weak_label = tk.Label(setting_window, text="Weak goal (hours)", bg=background_color,
+    self.weak_label = tk.Label(setting_window, text="Weak goal (hours)", bg=background_color,
                           activebackground=background_color)
     self.weak_label.place(x=window_width // 2 - 75, y=y_height + 280)
     self.week_goal_var = tk.StringVar(value=default_weak_goal)
@@ -116,12 +116,6 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     enter_button = tk.Button(setting_window, text="Enter",
                              command=lambda: apply(setting_window, self))
     enter_button.place(x=window_width // 2 - 30, y=y_height + 440)
-
-    # Error label
-
-    self.error_label = tk.Label(setting_window, fg="red", bg=background_color,
-                                activebackground=background_color)
-    self.error_label.place(x=window_width // 2 - 100, y=y_height + 420)
 
     setting_window.grab_set()
 
@@ -172,7 +166,7 @@ def apply(setting_window, self):
     error_message = ""
 
     if not is_number(self.time_remainder_var.get()):
-        self.time_label.config(fg="red")
+        self.time_label_remainder.config(fg="red")
 
     if not is_number(self.afk_mode_var.get()):
         self.afk_label.config(fg="red")
@@ -183,6 +177,5 @@ def apply(setting_window, self):
     if error_message:
         print("Error")
     else:
-        self.error_label.config(text="")
         save_settings(self)
         setting_window.destroy()

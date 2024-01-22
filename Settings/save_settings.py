@@ -14,12 +14,14 @@ def save_settings(self):
     afk = self.afk_mode_var.get()
     notification = self.time_remainder_var.get()
     week_goal = self.week_goal_var.get()
+    volume = self.volume_var.get()
 
     settings_data = {
         "screenshot": screenshot,
         "time_remainder": notification,
         "afk_mode": afk,
         "week_goal": week_goal,
+        "volume": volume,
     }
 
     with open(user_path, "w") as file:
@@ -42,6 +44,11 @@ def save_settings(self):
     self.hours, self.remainder = divmod(change, 60)
     self.goal_label.config(
         text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:}.{self.remainder // 6}")
+    try:
+        self.music_player.volume = volume / 10
+    except AttributeError:
+        print("Music not playing")
+        pass
 
 
 def load_settings(self, element_to_find):

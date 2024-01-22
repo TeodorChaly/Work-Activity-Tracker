@@ -49,6 +49,7 @@ class TimerApp:
         self.afk_mode = int(load_settings(self, "afk_mode"))
         self.week_goal = int(load_settings(self, "week_goal"))
         self.time_remainder = int(load_settings(self, "time_remainder")) * 60
+        self.volume = int(load_settings(self, "volume")) * 60
 
         # Time settings
         self.now = datetime.now()
@@ -307,7 +308,7 @@ class TimerApp:
         time_now = self.elapsed_time // 60
         day_goal = self.hours * 60 + self.remainder
 
-        print(day_goal, time_now, day_goal / 10 )
+        print(day_goal, time_now, day_goal / 10)
 
         if time_now >= day_goal:
             self.change_bg("\\App_image\\Circle\\circle_10.png")
@@ -358,6 +359,4 @@ class TimerApp:
 
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
-                         int(load_settings(self,
-                                           "time_remainder")), int(load_settings(self,
-                                                                                 "week_goal")))  # , int(self, "today_goal"), int(self, "week_goal")
+                         int(load_settings(self, "time_remainder")), int(load_settings(self, "week_goal")))
