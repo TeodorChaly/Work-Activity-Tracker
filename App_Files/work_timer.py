@@ -26,6 +26,9 @@ class TimerApp:
         play_img_path = background_image_path + "\\App_image\\play.png"
         pause_img_path = background_image_path + "\\App_image\\stop.png"
 
+        self.user_name = user_name
+        self.user_surname = user_surname
+
         bg_image = Image.open(big_image_path)
         bg_resized_image = bg_image.resize(
             (500, 500))
@@ -142,8 +145,8 @@ class TimerApp:
             if self.music_player.time >= self.music_player.source.duration:
                 print("End of song, playing again")
                 self.position = 0
-                self.music_player.seek(self.position)
                 self.music_player.play()
+                self.music_player.seek(self.position)
         self.root.after(100, self.check_playback)
 
     def check_audio(self):
@@ -169,8 +172,8 @@ class TimerApp:
         open_second_window(self)
 
     def random_picture(self):
-        min_val = 1000 * 10 * 60
-        max_val = 1000 * 25 * 60
+        min_val = 1000 * 5 * 60
+        max_val = 1000 * 15 * 60
         interval = random.randint(min_val, max_val)
 
         self.root.after(interval, self.screenshot_picture)
@@ -299,6 +302,8 @@ class TimerApp:
 
             self.goal_label.config(
                 text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}")
+
+            print()
 
             # print(self.session_time, self.session_time)
             self.root.after(1000, self.update_timer)

@@ -13,7 +13,7 @@ def download_audio(video_url, self, second_window):
 
         audio_stream = yt.streams.filter(only_audio=True).first()
 
-        audio_stream.download(output_path="./", filename="audio.mp3")
+        audio_stream.download(output_path="", filename="audio.mp3")
 
         print("Music saved")
 

@@ -142,6 +142,7 @@ def change_music(event, self):
         url = url_entry.get()
         download_audio(url, self, second_window)
         on_close_second_window(second_window)
+        self.music_player = None
 
     download_button = tk.Button(second_window, text="Save audio", command=start_download)
     download_button.pack()
