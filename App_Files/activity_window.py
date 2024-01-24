@@ -45,7 +45,7 @@ def open_second_window(self):
 
 
     text_widget = tk.Text(self.second_window, wrap="word", state="disabled")
-    text_widget.place(x=10, y=80, width=window_width - 20, height=window_height - 60)
+    text_widget.place(x=10, y=80, width=window_width - 20, height=window_height - 140)
 
     def on_date_hover(event, date):
         text_widget.tag_configure(f"hover_{date}", foreground="blue")
@@ -102,7 +102,7 @@ def open_second_window(self):
             text_widget.insert("end", info_text)
 
 
-        text_widget.insert("end", f"\n\n")
+        text_widget.insert("end", f"\n")
 
         text_widget.configure(state="disabled")
         row_num += 1
@@ -213,6 +213,7 @@ def open_second_window(self):
             else:
                 screenshot_label = tk.Label(scrollable_frame,
                                             text=f"Screenshots: No")
+                self.second_window.geometry(f"{500}x{500}")
                 screenshot_label.pack()
 
         new_button = tk.Button(scrollable_frame, text="Back to dates", command=restore_previous_layer)

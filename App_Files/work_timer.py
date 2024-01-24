@@ -1,5 +1,6 @@
 import os
 import random
+import time
 from datetime import datetime
 from time import strftime, gmtime
 
@@ -123,10 +124,11 @@ class TimerApp:
 
         # General settings
         self.running = False
-        self.time_last_break = 0
         self.next_notification_time = self.time_remainder
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.display_time()
+        self.interval = 0
+        self.remaining_interval = None
 
         # AFK mode checking
         self.aft_timer = 0
@@ -171,12 +173,16 @@ class TimerApp:
     def open_second_window_wrapper(self):
         open_second_window(self)
 
-    def random_picture(self):
-        min_val = 1000 * 5 * 60
-        max_val = 1000 * 15 * 60
-        interval = random.randint(min_val, max_val)
+    def random_picture(self):  # Screenshots
+        if self.remaining_interval is not None:
+            self.interval = self.remaining_interval
+            self.remaining_interval = None
+        else:
+            min_val = 1000 * 10 * 1000
+            max_val = 1000 * 20 * 1000
+            self.interval = random.randint(min_val, max_val)
 
-        self.root.after(interval, self.screenshot_picture)
+        self.root.after(self.interval, self.screenshot_picture)
 
     def screenshot_picture(self):  # Fix (memory leak)
         if self.running:
@@ -220,6 +226,8 @@ class TimerApp:
 
             self.random_picture()
 
+            self.timer_start_time = time.time()  # Сохраняем время начала интервала
+
     def pause_timer(self):
 
         self.save_time()
@@ -237,12 +245,20 @@ class TimerApp:
 
         self.session_time = 0
 
+        if self.interval > 0:
+            self.remaining_interval = self.interval - int((time.time() - self.timer_start_time) * 1000)
+            self.interval = 0
+
     def temporary_pause_timer(self):
         self.save_time()
         self.running = False
         self.start_button['state'] = tk.NORMAL
         self.pause_button['state'] = tk.DISABLED
         self.wait_for_activity_to_resume_timer()
+
+        if self.interval > 0:
+            self.remaining_interval = self.interval - int((time.time() - self.timer_start_time) * 1000)
+            self.interval = 0
 
     def on_close(self):
         self.save_time()
@@ -300,10 +316,10 @@ class TimerApp:
 
             self.session_time += 1
 
+            print(self.elapsed_time)
+
             self.goal_label.config(
                 text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}")
-
-            print()
 
             # print(self.session_time, self.session_time)
             self.root.after(1000, self.update_timer)
@@ -313,7 +329,7 @@ class TimerApp:
         time_now = self.elapsed_time // 60
         day_goal = self.hours * 60 + self.remainder
 
-        print(day_goal, time_now, day_goal / 10)
+        # print(day_goal, time_now, day_goal / 10)
 
         if time_now >= day_goal:
             self.change_bg("\\App_image\\Circle\\circle_10.png")
