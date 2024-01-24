@@ -43,5 +43,3 @@ def popup_notification(message, time):
     label_image.image = tk_image
 
     popup_window.after(time*1000, popup_window.destroy)
-
-    popup_window.mainloop()

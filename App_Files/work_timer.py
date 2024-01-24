@@ -52,7 +52,7 @@ class TimerApp:
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
         self.week_goal = int(load_settings(self, "week_goal"))
-        self.time_remainder = int(load_settings(self, "time_remainder")) * 60
+        self.time_remainder = int(load_settings(self, "time_remainder"))
         self.volume = int(load_settings(self, "volume")) * 60
 
         # Time settings
@@ -267,7 +267,6 @@ class TimerApp:
     def wait_for_activity_to_resume_timer(self):
         if not self.afk_detector.is_afk():
             popup_notification(f"Welcome back!\n You have been offline for {self.aft_timer}", 2)
-
             self.aft_timer = 0
             self.start_timer()
             self.now = datetime.now()
@@ -316,7 +315,7 @@ class TimerApp:
 
             self.session_time += 1
 
-            print(self.elapsed_time)
+            print(self.elapsed_time,  self.next_notification_time)
 
             self.goal_label.config(
                 text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}")
