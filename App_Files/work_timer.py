@@ -15,7 +15,7 @@ from App_Files.afk_detektor import AFKDetector
 from App_Files.play_music import audio_check, audio_download, play_music_switcher
 from DataBase.db_logs_operations import session_db_add, get_time_today
 from DataBase.db_time_writing import db_time_write
-from App_Files.images_controller import take_screenshot
+from App_Files.images_controller import take_screenshot_all_monitors as take_screenshots
 from Settings.app_settings import settings_windows
 from Settings.save_settings import load_settings
 
@@ -52,7 +52,7 @@ class TimerApp:
         self.screenshot = load_settings(self, "screenshot")
         self.afk_mode = int(load_settings(self, "afk_mode"))
         self.week_goal = int(load_settings(self, "week_goal"))
-        self.time_remainder = int(load_settings(self, "time_remainder"))
+        self.time_remainder = int(load_settings(self, "time_remainder")) * 60
         self.volume = int(load_settings(self, "volume")) * 60
 
         # Time settings
@@ -177,16 +177,18 @@ class TimerApp:
         if self.remaining_interval is not None:
             self.interval = self.remaining_interval
             self.remaining_interval = None
+            print("Continue (in seconds)", self.interval//1000)
         else:
-            min_val = 1000 * 10 * 1000
-            max_val = 1000 * 20 * 1000
+            min_val = 1000 * 10 * 60
+            max_val = 1000 * 20 * 60
             self.interval = random.randint(min_val, max_val)
+            print("New time for screenshot: ", self.interval//1000)
 
         self.root.after(self.interval, self.screenshot_picture)
 
     def screenshot_picture(self):  # Fix (memory leak)
         if self.running:
-            screenshot_path = take_screenshot()
+            screenshot_path = take_screenshots()
 
             session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
                            screenshot_path)
@@ -315,7 +317,7 @@ class TimerApp:
 
             self.session_time += 1
 
-            print(self.elapsed_time,  self.next_notification_time)
+            print(self.elapsed_time, self.next_notification_time)
 
             self.goal_label.config(
                 text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}")
@@ -379,4 +381,5 @@ class TimerApp:
 
     def setting_button_click(self):
         settings_windows(self, load_settings(self, "screenshot"), int(load_settings(self, "afk_mode")),
-                         int(load_settings(self, "time_remainder")), int(load_settings(self, "week_goal")))
+                         int(load_settings(self, "time_remainder")), int(load_settings(self, "week_goal")),
+                         int(load_settings(self, "volume")))

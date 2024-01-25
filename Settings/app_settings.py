@@ -7,7 +7,8 @@ from App_Files.play_music import audio_download, download_audio
 from Settings.save_settings import save_settings
 
 
-def settings_windows(self, default_screenshot, default_afk_mode, default_time_remainder, default_weak_goal):
+def settings_windows(self, default_screenshot, default_afk_mode, default_time_remainder, default_weak_goal,
+                     default_volume):
     window_width = 300
     window_height = 550
     background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -79,7 +80,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
 
     # Time remainder - Int
     self.time_label_remainder = tk.Label(setting_window, text="Time remainder (minute)", bg=background_color,
-                          activebackground=background_color)
+                                         activebackground=background_color)
     self.time_label_remainder.place(x=window_width // 2 - 100, y=y_height + 140)
     self.time_remainder_var = tk.StringVar(value=default_time_remainder)
     time_remainder_entry = tk.Entry(setting_window, textvariable=self.time_remainder_var, bg=background_color)
@@ -87,7 +88,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
 
     # AFK Mode - Int
     self.afk_label = tk.Label(setting_window, text="AFK Mode (minute)", bg=background_color,
-                         activebackground=background_color)
+                              activebackground=background_color)
     self.afk_label.place(x=window_width // 2 - 75, y=y_height + 210)
     self.afk_mode_var = tk.StringVar(value=default_afk_mode)
     afk_mode_entry = tk.Entry(setting_window, textvariable=self.afk_mode_var, bg=background_color)
@@ -95,7 +96,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
 
     # Weak goal - Int
     self.weak_label = tk.Label(setting_window, text="Weak goal (hours)", bg=background_color,
-                          activebackground=background_color)
+                               activebackground=background_color)
     self.weak_label.place(x=window_width // 2 - 75, y=y_height + 280)
     self.week_goal_var = tk.StringVar(value=default_weak_goal)
     week_goal_entry = tk.Entry(setting_window, textvariable=self.week_goal_var)
@@ -106,7 +107,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     tk.Label(setting_window, text="Volume of music", bg=background_color,
              activebackground=background_color).place(x=window_width // 2 - 75, y=y_height + 340)
 
-    self.volume_var = tk.DoubleVar()
+    self.volume_var = tk.IntVar(value=default_volume)
     volume_scale = tk.Scale(setting_window, from_=0, to=10, orient='horizontal', variable=self.volume_var,
                             bg=background_color, activebackground=background_color)
     volume_scale.place(x=window_width // 2 - 55, y=y_height + 380)
