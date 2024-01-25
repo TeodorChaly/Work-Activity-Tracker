@@ -42,8 +42,6 @@ def open_second_window(self):
 
     self.second_window.resizable(False, False)
 
-
-
     text_widget = tk.Text(self.second_window, wrap="word", state="disabled")
     text_widget.place(x=10, y=80, width=window_width - 20, height=window_height - 140)
 
@@ -66,9 +64,9 @@ def open_second_window(self):
     # text_widget.insert("end", f"Total time per week\n{data_formatting(total_week_seconds)}", "total_week")
 
     main_text = self.time_label_remainder = tk.Label(self.second_window,
-                                                     text=f"Total time per week:\n{data_formatting(total_week_seconds)}", font=("Arial", 15, "bold"))
+                                                     text=f"Total time per week:\n{data_formatting(total_week_seconds)}",
+                                                     font=("Arial", 15, "bold"))
     main_text.place(x=0, y=0, width=window_width)
-
 
     row_num = 2
 
@@ -92,7 +90,6 @@ def open_second_window(self):
                            f" seconds)\n",
                            date_tag)
 
-
         text_widget.tag_bind(date_tag, "<Button-1>",
                              lambda e, d=date: show_date_info(e, d, self.email))
 
@@ -100,7 +97,6 @@ def open_second_window(self):
             minutes, seconds = divmod(duration, 60)
             info_text = f" {hour} - {minutes} minutes and {seconds} seconds\n"
             text_widget.insert("end", info_text)
-
 
         text_widget.insert("end", f"\n")
 
@@ -172,9 +168,9 @@ def open_second_window(self):
                         screenshots.append(i)
 
             if screenshots:
-                screenshot_label = tk.Label(scrollable_frame,
-                                            text=f"Screenshots:")
-                screenshot_label.pack()
+                # screenshot_label = tk.Label(scrollable_frame,
+                #                             text=f"Screenshots:")
+                # screenshot_label.pack()
 
                 print(screenshots)
 
@@ -204,6 +200,9 @@ def open_second_window(self):
                                     screenshot_img_label = tk.Label(screenshot_frame, image=tk_image)
                                     screenshot_img_label.image = tk_image
                                     screenshot_img_label.pack(side=tk.LEFT, padx=5)
+
+                                    screenshot_img_label.bind("<Button-1>",
+                                                              lambda e, path=screenshot_data: open_image(path))
                                 except Exception as e:
                                     pass
                         else:
@@ -225,6 +224,10 @@ def open_second_window(self):
         self.second_window.bind_all("<MouseWheel>", _on_mousewheel)
         self.second_window.update_idletasks()
         canvas.config(scrollregion=canvas.bbox("all"))
+
+    def open_image(image_path):
+        image_window = tk.Toplevel()
+        image_window.title("Screenshot")
 
     def restore_previous_layer():
         screen_width = self.second_window.winfo_screenwidth()

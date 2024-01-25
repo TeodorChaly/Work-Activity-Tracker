@@ -6,6 +6,8 @@ from time import strftime, gmtime
 
 import tkinter as tk
 from tkinter import font
+
+import pyglet
 from PIL import Image, ImageTk
 from pynput import mouse, keyboard
 
@@ -34,7 +36,6 @@ class TimerApp:
         bg_resized_image = bg_image.resize(
             (500, 500))
         self.bg_image = ImageTk.PhotoImage(bg_resized_image)
-
         self.background_label = tk.Label(root, image=self.bg_image)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -64,12 +65,7 @@ class TimerApp:
         change = self.week_goal * 60 // 7
         self.hours, self.remainder = divmod(change, 60)
 
-        # top_frame = tk.Frame(root)
-        # top_frame.pack(side=tk.TOP, fill=tk.X)
-        #
-        # self.user_info_label = tk.Label(top_frame, text=f"{user_name} {user_surname}", font=("Arial", 10))
-        # self.user_info_label.pack(side=tk.LEFT, padx=10, pady=10)
-        #
+        # GUI
         custom_font = font.Font(family="Open Sans", size=16, weight="normal")
         self.setting_button = tk.Button(self.root, text="Settings", relief="flat", command=self.setting_button_click,
                                         bg=background_color, activebackground=background_color, font=custom_font,
@@ -99,14 +95,6 @@ class TimerApp:
         custom_font = font.Font(family="Open Sans", size=54, weight="normal")
         self.time_label = tk.Label(root, text="00:00:00", font=custom_font, bg=background_color)
         self.time_label.place(x=36, y=188)
-
-        # self.start_button = tk.Button(root, text="GO", command=self.start_timer, bg=background_color,
-        #                               activebackground=background_color)
-        # self.start_button.place(x=170, y=100)
-        #
-        # self.pause_button = tk.Button(root, text="PAUSE", command=self.pause_timer, state=tk.DISABLED,
-        #                               bg=background_color, activebackground=background_color)
-        # self.pause_button.place(x=200, y=100)
 
         play_image = Image.open(play_img_path).resize((82, 82))
         pause_image = Image.open(pause_img_path).resize((82, 82))
@@ -141,6 +129,8 @@ class TimerApp:
 
         self.music_player = None
         self.position = 0
+
+        self.image_progress_changer()
 
     def check_playback(self):
         if self.music_player is not None:
@@ -177,12 +167,12 @@ class TimerApp:
         if self.remaining_interval is not None:
             self.interval = self.remaining_interval
             self.remaining_interval = None
-            print("Continue (in seconds)", self.interval//1000)
+            # print("Continue (in seconds)", self.interval // 1000)
         else:
             min_val = 1000 * 10 * 60
             max_val = 1000 * 20 * 60
             self.interval = random.randint(min_val, max_val)
-            print("New time for screenshot: ", self.interval//1000)
+            # print("New time for screenshot: ", self.interval // 1000)
 
         self.root.after(self.interval, self.screenshot_picture)
 
@@ -228,7 +218,7 @@ class TimerApp:
 
             self.random_picture()
 
-            self.timer_start_time = time.time()  # Сохраняем время начала интервала
+            self.timer_start_time = time.time()
 
     def pause_timer(self):
 
@@ -268,7 +258,7 @@ class TimerApp:
 
     def wait_for_activity_to_resume_timer(self):
         if not self.afk_detector.is_afk():
-            popup_notification(f"Welcome back!\n You have been offline for {self.aft_timer}", 2)
+            popup_notification(f"        Welcome back!\n You have been offline for {self.aft_timer}", 2)
             self.aft_timer = 0
             self.start_timer()
             self.now = datetime.now()
@@ -297,14 +287,18 @@ class TimerApp:
 
             if self.afk_detector.is_afk():
                 # PopupNotification(self.root, "You are AFK.", 2).show()
-                popup_notification("You are AFK.", 2)
+                popup_notification("You are AFK.", 10)
                 self.temporary_pause_timer()
 
             self.next_notification_time -= 1
             if self.next_notification_time <= 0:
-                popup_notification("Time for a break!", 2)
-                # PopupNotification(self.root, "Time for a break!", 2).show()
-                # print(self.time_remainder)
+                notification_play = pyglet.media.Player()
+                notification_play.queue(pyglet.resource.media("notification_sound.mp3"))
+                notification_play.volume = int(load_settings(self, "week_goal")) / 10
+                notification_play.play()
+                popup_notification(f"It's been {self.time_remainder // 60} minute.\n   Take a break!",
+                                   5)
+
                 self.next_notification_time = self.time_remainder
 
             if self.elapsed_time % 1 == 0:  # Check every 10 seconds and save time and DB
@@ -313,24 +307,20 @@ class TimerApp:
                     file.write(
                         str(self.current_time) + "|" + str(self.email) + "|" + str(self.current_time) + "|" + str(
                             self.current_hour) + "|" + str(self.session_time) + "|" + "None")
-                    # print(self.session_time)
 
             self.session_time += 1
 
-            print(self.elapsed_time, self.next_notification_time)
+            print("Total today's time:", self.elapsed_time, "Next, notification:", self.next_notification_time)
 
             self.goal_label.config(
                 text=f"Goal(h)\n{round((self.elapsed_time // 60) / 60, 2)}/{self.hours:1}.{self.remainder // 6}")
 
-            # print(self.session_time, self.session_time)
             self.root.after(1000, self.update_timer)
 
     def image_progress_changer(self):
         # week_goal round to int
         time_now = self.elapsed_time // 60
         day_goal = self.hours * 60 + self.remainder
-
-        # print(day_goal, time_now, day_goal / 10)
 
         if time_now >= day_goal:
             self.change_bg("\\App_image\\Circle\\circle_10.png")

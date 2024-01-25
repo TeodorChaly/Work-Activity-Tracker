@@ -49,7 +49,6 @@ def play_music_switcher(self):
 
 
 def audio_check(self):
-    # Check if audio.mp3 exists
     if os.path.exists("audio.mp3"):
         return True
     else:

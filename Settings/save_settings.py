@@ -1,6 +1,8 @@
 import json
 import os
+import shutil
 
+from datetime import datetime, timedelta
 from pynput import mouse, keyboard
 
 from App_Files.afk_detektor import AFKDetector
@@ -55,7 +57,7 @@ def load_settings(self, element_to_find):
     try:
         with open(user_path, "r") as file:
             settings_data = json.load(file)
-            print(settings_data)
+            # print(settings_data)
             result = settings_data[element_to_find]
             return result
     except FileNotFoundError:
@@ -63,6 +65,8 @@ def load_settings(self, element_to_find):
 
 
 def pre_start_configuration():
+    clearing_screenshots()
+
     default_settings = {
         "screenshot": True,
         "time_remainder": "5",
@@ -88,3 +92,24 @@ def pre_start_configuration():
             session_db_add(current_time, email, current_time, current_hour, session_time, screen_shot_path)
 
         os.remove("App_Files/time_cash.txt")
+
+
+def clearing_screenshots():
+    screenshots_folder = 'Images'
+    cleared_folder = os.path.join(screenshots_folder, 'clear')
+    os.makedirs(cleared_folder, exist_ok=True)  # Создаем папку, если она еще не существует
+
+    one_week_ago = datetime.now() - timedelta(days=8)
+
+    for filename in os.listdir(screenshots_folder):
+        if filename.startswith("screenshot_") and filename.endswith(".png"):
+            timestamp_str = filename.split("_")[1] + "_" + filename.split("_")[2].split(".")[0]
+            screenshot_datetime = datetime.strptime(timestamp_str, '%Y%m%d_%H%M')
+
+            if screenshot_datetime < one_week_ago:
+                source_path = os.path.join(screenshots_folder, filename)
+                destination_path = os.path.join(cleared_folder, filename)
+
+                # Перемещаем файл
+                shutil.move(source_path, destination_path)
+                print(f"Перемещен: {filename}")
