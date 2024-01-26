@@ -42,6 +42,9 @@ class TimerApp:
         self.root = root
         self.email = email
         root.title("Timer")
+        ico = Image.open('App_image/Logo_Small.jpg')
+        photo = ImageTk.PhotoImage(ico)
+        root.wm_iconphoto(False, photo)
 
         root.geometry("500x500")
         root.resizable(False, False)

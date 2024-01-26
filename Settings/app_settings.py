@@ -130,6 +130,10 @@ def change_music(event, self):
     second_window.title("Choose audio")
     second_window.grab_set()  # Делает окно модальным
 
+    ico = Image.open('App_image/Logo_Small.jpg')
+    photo = ImageTk.PhotoImage(ico)
+    second_window.wm_iconphoto(False, photo)
+
     url_label = tk.Label(second_window, text="Enter link of audio from YouTube:")
     url_label.pack()
 

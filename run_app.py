@@ -1,5 +1,4 @@
 import os
-import time
 
 import tkinter as tk
 from tkinter import Label, Entry, Button
@@ -9,7 +8,6 @@ from cryptography.fernet import Fernet
 from App_Files.work_timer import TimerApp
 from DataBase.db_reg_log import register_user, login_user
 from Settings.save_settings import pre_start_configuration
-
 
 def load_key():
     load_dotenv(dotenv_path="Settings/Env_Settings/.env")
@@ -44,6 +42,7 @@ class App:
     def __init__(self, root):
         self.root = root
         self.root.title("Timer App")
+
 
         self.frame = tk.Frame(self.root)
         self.frame.pack()
@@ -131,5 +130,4 @@ if __name__ == "__main__":
         app = App(root)
         root.mainloop()
     except Exception as e:
-        time.sleep(10)
         print(e)
