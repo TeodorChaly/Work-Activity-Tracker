@@ -34,6 +34,10 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     setting_window.geometry(f"{window_width}x{window_height}+{position_right}+{position_down}")
     setting_window.resizable(False, False)
 
+    ico = Image.open('App_image/Logo_Small.ico')
+    photo = ImageTk.PhotoImage(ico)
+    setting_window.wm_iconphoto(False, photo)
+
     y_height = 50
 
     # Elements
@@ -129,10 +133,6 @@ def change_music(event, self):
     second_window = tk.Toplevel(self.root)
     second_window.title("Choose audio")
     second_window.grab_set()  # Делает окно модальным
-
-    ico = Image.open('App_image/Logo_Small.jpg')
-    photo = ImageTk.PhotoImage(ico)
-    second_window.wm_iconphoto(False, photo)
 
     url_label = tk.Label(second_window, text="Enter link of audio from YouTube:")
     url_label.pack()

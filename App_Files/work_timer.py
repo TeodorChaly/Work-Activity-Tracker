@@ -6,7 +6,7 @@ from time import strftime, gmtime
 
 import tkinter as tk
 from tkinter import font
-
+import ctypes
 import pyglet
 from PIL import Image, ImageTk
 from pynput import mouse, keyboard
@@ -42,9 +42,12 @@ class TimerApp:
         self.root = root
         self.email = email
         root.title("Timer")
-        ico = Image.open('App_image/Logo_Small.jpg')
+        ico = Image.open('App_image/Logo_Small.ico')
         photo = ImageTk.PhotoImage(ico)
         root.wm_iconphoto(False, photo)
+
+        myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
         root.geometry("500x500")
         root.resizable(False, False)

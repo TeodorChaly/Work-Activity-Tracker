@@ -33,7 +33,7 @@ def aggregate_activity_by_hour(data):
 def open_second_window(self):
     self.second_window = tk.Toplevel(self.root)
     self.second_window.title(f"Activity")  # of {self.user_name} 7 days)
-    ico = Image.open('App_image/Logo_Small.jpg')
+    ico = Image.open('App_image/Logo_Small.ico')
     photo_1 = ImageTk.PhotoImage(ico)
     self.second_window.wm_iconphoto(False, photo_1)
 
