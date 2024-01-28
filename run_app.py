@@ -30,11 +30,16 @@ def encrypt_and_save_user_data(username, lastname, email, user_password):
 
 def load_and_decrypt_user_data():
     if os.path.exists(USER_DATA_FILE):
+
         with open(USER_DATA_FILE, 'rb') as file:
             encrypted_data = file.read()
             decrypted_data = cipher_suite.decrypt(encrypted_data).decode()
+            print(1234444)
+
             username, lastname, email, password = decrypted_data.split("||")
+
             return username, lastname, email, password
+
     return None, None, None, None
 
 
@@ -62,7 +67,9 @@ class App:
 
         self.is_registration_form = True
         self.update_form_view()
+
         username, lastname, email, password = load_and_decrypt_user_data()
+
         if username and lastname and email and password:
             self.create_main_interface(username, lastname, email, password)
 
@@ -97,6 +104,7 @@ class App:
 
     def create_main_interface(self, username, lastname, email, password):
         self.root.destroy()
+
         app_root = tk.Tk()
         TimerApp(app_root, username, lastname, email)
 
@@ -128,6 +136,7 @@ if __name__ == "__main__":
         pre_start_configuration()
         root = tk.Tk()
         app = App(root)
+
         root.mainloop()
     except Exception as e:
         print(e)

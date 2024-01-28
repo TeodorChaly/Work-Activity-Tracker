@@ -67,7 +67,7 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     label_email.bind("<Enter>",
                      lambda event: on_mouse_enter(event, "Click to change email", window_width // 2 - 85, 50))
     label_email.bind("<Leave>", lambda event: on_mouse_leave(event, f"{self.email}", window_width // 2 - 60, 50))
-    label_email.bind("<Button-1>", on_email_click)
+    label_email.bind("<Button-1>", lambda event: on_email_click(event, self))
 
     label_music.bind("<Enter>",
                      lambda event: on_mouse_enter(event, "Click to change music", window_width // 2 - 90,
@@ -125,9 +125,26 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     setting_window.grab_set()
 
 
-def on_email_click(event):
+def on_email_click(event, self):
     print("Email label was clicked")
 
+    file_path = 'cash_user.bin'
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"File {file_path} was deleted.")
+        self.root.destroy()
+        # importing()
+
+    else:
+        print(f"File {file_path} wasn't found.")
+
+def importing():
+    from run_app import App
+
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
 
 def change_music(event, self):
     second_window = tk.Toplevel(self.root)

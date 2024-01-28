@@ -41,10 +41,16 @@ def login_user(email, password):
         try:
             cursor.execute(query, (email,))
             result = cursor.fetchone()
-            print(result[1], result[2])
+            try:
+                print(result[0], result[1])
+            except TypeError:
+                print("User not found")
+                return False, None, None
+
             if result and check_password(result[0], password):
                 return True, result[1], result[2]
             else:
+                print("Wrong password")
                 return False, None, None
         except Error as e:
             print(f"The error '{e}' occurred")
