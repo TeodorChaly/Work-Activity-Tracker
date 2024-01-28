@@ -1,3 +1,4 @@
+import os
 import re
 
 import tkinter as tk
@@ -33,23 +34,39 @@ def aggregate_activity_by_hour(data):
 def open_second_window(self):
     self.second_window = tk.Toplevel(self.root)
     self.second_window.title(f"Activity")  # of {self.user_name} 7 days)
+
     ico = Image.open('App_image/Logo_Small.ico')
     photo_1 = ImageTk.PhotoImage(ico)
     self.second_window.wm_iconphoto(False, photo_1)
 
-    screen_width = self.second_window.winfo_screenwidth()
-    screen_height = self.second_window.winfo_screenheight()
-    window_width = int(screen_width * 0.25)
-    window_height = int(screen_height * 0.7)
+    background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    big_image_path = background_image_path + "\\App_image\\bg_activity.png"
+
+    window_width = int(500)
+    window_height = int(800)
     self.second_window.geometry(f"{window_width}x{window_height}")
 
     self.second_window.resizable(False, False)
 
-    text_widget = tk.Text(self.second_window, wrap="word", state="disabled")
-    text_widget.place(x=10, y=80, width=window_width - 20, height=window_height - 140)
+    self.canvas = tk.Canvas(self.second_window, width=window_width, height=window_height)
+    self.canvas.pack(fill="both", expand=True)
+
+    background_image_path = os.path.join(big_image_path)
+    bg_image = Image.open(background_image_path)
+    bg_image = bg_image.resize((window_width, window_height))
+    bg_photo = ImageTk.PhotoImage(bg_image)
+
+    self.canvas.create_image(0, 0, anchor="nw", image=bg_photo)
+    self.canvas.image = bg_photo
+
+    background_color = '#545454'
+
+    text_widget = tk.Text(self.second_window, wrap="word", state="disabled", bg=background_color, borderwidth=0,
+                          highlightthickness=0)
+    text_widget.place(x=60, y=160, width=window_width - 150, height=window_height - 290)
 
     def on_date_hover(event, date):
-        text_widget.tag_configure(f"hover_{date}", foreground="blue")
+        text_widget.tag_configure(f"hover_{date}", foreground="white")
         text_widget.tag_add(f"hover_{date}", f"date_{date.replace(':', '_').replace('-', '_')}.first",
                             f"date_{date.replace(':', '_').replace('-', '_')}.last")
 
@@ -62,14 +79,9 @@ def open_second_window(self):
     aggregated_data = aggregate_activity_by_hour(raw_data)
 
     total_week_seconds = sum(sum(hours.values()) for hours in aggregated_data.values())
-    #
-    # text_widget.configure(state="normal")
-    # text_widget.insert("end", f"Total time per week\n{data_formatting(total_week_seconds)}", "total_week")
 
-    main_text = self.time_label_remainder = tk.Label(self.second_window,
-                                                     text=f"Total time per week:\n{data_formatting(total_week_seconds)}",
-                                                     font=("Arial", 15, "bold"))
-    main_text.place(x=0, y=0, width=window_width)
+    text = f"Total time per week\n          {data_formatting(total_week_seconds)}"
+    self.canvas.create_text(window_width / 2, 39, text=text, font=("Arial", 13, "bold"), fill="black", anchor="n")
 
     row_num = 2
 
@@ -89,8 +101,8 @@ def open_second_window(self):
             print("Next")
 
         text_widget.insert("end",
-                           f"{date} ({divmod(total_day_seconds, 60)[0]} minutes and {divmod(total_day_seconds, 60)[1]}"
-                           f" seconds)\n",
+                           f"  {date} ({divmod(total_day_seconds, 60)[0]} min, {divmod(total_day_seconds, 60)[1]}"
+                           f" sec)\n",
                            date_tag)
 
         text_widget.tag_bind(date_tag, "<Button-1>",
@@ -98,7 +110,7 @@ def open_second_window(self):
 
         for hour, duration in sorted(hours.items()):
             minutes, seconds = divmod(duration, 60)
-            info_text = f" {hour} - {minutes} minutes and {seconds} seconds\n"
+            info_text = f"   {hour} - {minutes} min and {seconds} sec\n"
             text_widget.insert("end", info_text)
 
         text_widget.insert("end", f"\n")
@@ -109,14 +121,15 @@ def open_second_window(self):
     text_widget.tag_configure("date", font=("Arial", 14, "bold"))
     text_widget.tag_configure("total_week", font=("Arial", 12, "bold"))
 
-    close_button = tk.Button(self.second_window, text="Close", command=self.second_window.destroy, pady=10)
-    close_button.place(x=window_width / 2 - 50, y=window_height - 50, width=100, height=40)
-    # text_widget.window_create(tk.END, window=close_button)
+    close_button = tk.Button(self.second_window, text="Close", command=self.second_window.destroy, pady=10,
+                             font=("Arial", 14, "bold"), fg="white", background="#a6a6a6", borderwidth=0,
+                             highlightthickness=0)
+    close_button.place(x=window_width / 2 - 50, y=window_height - 67, width=100, height=40)
 
     text_widget.config(state="disabled")
 
     def show_date_info(event, data, email):
-        text_widget.pack_forget()
+        self.canvas.forget()
 
         screen_width = self.second_window.winfo_screenwidth()
         screen_height = self.second_window.winfo_screenheight()
@@ -171,9 +184,6 @@ def open_second_window(self):
                         screenshots.append(i)
 
             if screenshots:
-                # screenshot_label = tk.Label(scrollable_frame,
-                #                             text=f"Screenshots:")
-                # screenshot_label.pack()
 
                 print(screenshots)
 
@@ -233,17 +243,14 @@ def open_second_window(self):
         image_window.title("Screenshot")
 
     def restore_previous_layer():
-        screen_width = self.second_window.winfo_screenwidth()
-        screen_height = self.second_window.winfo_screenheight()
-        window_width = int(screen_width * 0.25)
-        window_height = int(screen_height * 0.7)
+        window_width = int(500)
+        window_height = int(800)
         self.second_window.geometry(f"{window_width}x{window_height}")
 
         for widget in self.second_window.winfo_children():
             widget.pack_forget()
 
-        text_widget.place(x=10, y=80, width=window_width - 20, height=window_height - 60)
-
+        self.canvas.pack(fill="both", expand=True)
 
 def remake(data):
     activity_by_hour = {}
