@@ -187,8 +187,10 @@ def open_second_window(self):
 
                 print(screenshots)
 
-                screenshot_frame = tk.Frame(scrollable_frame)
-                screenshot_frame.pack()
+                screenshot_frame = tk.Frame(scrollable_frame, highlightthickness=2, highlightbackground="gray")
+                screenshot_frame.pack(pady=5, padx=70, fill=tk.BOTH, expand=True)
+
+
                 for i in range(0, len(screenshots), 3):
                     screenshot_row = screenshots[i:i + 3]
                     screenshot_frame = tk.Frame(scrollable_frame)
@@ -212,7 +214,7 @@ def open_second_window(self):
 
                                     screenshot_img_label = tk.Label(screenshot_frame, image=tk_image)
                                     screenshot_img_label.image = tk_image
-                                    screenshot_img_label.pack(side=tk.LEFT, padx=5)
+                                    screenshot_img_label.pack(side=tk.LEFT)
 
                                     screenshot_img_label.bind("<Button-1>",
                                                               lambda e, path=screenshot_data: open_image(path))
@@ -229,7 +231,7 @@ def open_second_window(self):
                 screenshot_label.pack()
 
         new_button = tk.Button(scrollable_frame, text="Back to dates", command=restore_previous_layer)
-        new_button.pack(anchor='n', expand=True)
+        new_button.pack(anchor='n', expand=True, pady=10)
 
         def _on_mousewheel(event):
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
@@ -251,7 +253,6 @@ def open_second_window(self):
             widget.pack_forget()
 
         self.canvas.pack(fill="both", expand=True)
-
 def remake(data):
     activity_by_hour = {}
 
