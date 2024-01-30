@@ -44,7 +44,10 @@ def open_second_window(self):
 
     window_width = int(500)
     window_height = int(800)
-    self.second_window.geometry(f"{window_width}x{window_height}")
+    position_right = int(self.root.winfo_x() + (self.root.winfo_width() / 2 - window_width / 2))
+    position_down = int(self.root.winfo_y() + (self.root.winfo_height() / 2 - window_height / 2))
+    self.second_window.geometry(f"{window_width}x{window_height}+{position_right}+{position_down + 150}")
+    self.second_window.grab_set()
 
     self.second_window.resizable(False, False)
 
@@ -142,7 +145,7 @@ def open_second_window(self):
         size_x = window_width
         size_y = window_height
 
-        self.second_window.geometry(f"{size_x}x{size_y}+{x}+{y}")
+        self.second_window.geometry(f"{size_x}x{size_y}+{position_right}+{position_down + 150}")
         self.second_window.title("Activity Info")
 
         result = day_info_db(data, email)
@@ -190,7 +193,6 @@ def open_second_window(self):
                 screenshot_frame = tk.Frame(scrollable_frame, highlightthickness=2, highlightbackground="gray")
                 screenshot_frame.pack(pady=5, padx=70, fill=tk.BOTH, expand=True)
 
-
                 for i in range(0, len(screenshots), 3):
                     screenshot_row = screenshots[i:i + 3]
                     screenshot_frame = tk.Frame(scrollable_frame)
@@ -227,7 +229,7 @@ def open_second_window(self):
             else:
                 screenshot_label = tk.Label(scrollable_frame,
                                             text=f"Screenshots: No")
-                self.second_window.geometry(f"{500}x{500}")
+                self.second_window.geometry(f"{500}x{500}+{position_right}+{position_down + 150}")
                 screenshot_label.pack()
 
         new_button = tk.Button(scrollable_frame, text="Back to dates", command=restore_previous_layer)
@@ -247,12 +249,14 @@ def open_second_window(self):
     def restore_previous_layer():
         window_width = int(500)
         window_height = int(800)
-        self.second_window.geometry(f"{window_width}x{window_height}")
+        self.second_window.geometry(f"{window_width}x{window_height}+{position_right}+{position_down + 150}")
 
         for widget in self.second_window.winfo_children():
             widget.pack_forget()
 
         self.canvas.pack(fill="both", expand=True)
+
+
 def remake(data):
     activity_by_hour = {}
 

@@ -138,17 +138,18 @@ def on_email_click(event, self):
         os.remove(file_path)
         print(f"File {file_path} was deleted.")
         self.root.destroy()
-        # importing()
+        re_log_reg()
 
     else:
         print(f"File {file_path} wasn't found.")
 
 
-def importing():
+def re_log_reg():
     from run_app import App
 
     root = tk.Tk()
     app = App(root)
+
     root.mainloop()
 
 

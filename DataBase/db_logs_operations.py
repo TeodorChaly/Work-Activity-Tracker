@@ -56,7 +56,12 @@ def get_time_today(gmail, today_date):
         for time_minute in time:
             total_time += time_minute[0]
         return total_time
+        # set_goals()
+
     else:
         return 0
+
+# def set_goals():
+
 
 # get_time_today("tc00121@rvt.lv", "2024-01-04")
