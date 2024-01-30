@@ -38,23 +38,22 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     photo = ImageTk.PhotoImage(ico)
     setting_window.wm_iconphoto(False, photo)
 
-    y_height = 50
+    y_height = 15
 
     # Elements
-    label_setting = tk.Label(setting_window, text=f"Settings", font=("Arial", 15), bg=background_color,
+    label_setting = tk.Label(setting_window, text=f"Settings", font=("Arial", 16), bg=background_color,
                              activebackground=background_color)
-    label_setting.place(x=window_width // 2 - 60, y=10)
+    label_setting.place(x=window_width // 2 - 60, y=20)
 
     label_email = tk.Label(setting_window, text=f"{self.email}", bg=background_color,
-                           activebackground=background_color)
-    label_email.place(x=window_width // 2 - 60, y=50)
+                           activebackground=background_color, font=("Arial", 11))
+    setting_window.update()
+    label_email.place(x=window_width // 2 - 30, y=60)
 
     label_music = tk.Label(setting_window, text=f"Change music", bg=background_color,
                            activebackground=background_color)
-    label_music.place(x=window_width // 2 - 60, y=y_height + 65)
+    label_music.place(x=window_width // 2 - 60, y=y_height + 350)
 
-    # volume_label = tk.Label(setting_window, text="Volume (0-10):")
-    # volume_label.place(x=window_width // 2, y=180)
 
     def on_mouse_enter(event, text, x, y):
         event.widget.config(text=text, fg='blue')
@@ -65,15 +64,15 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
         event.widget.place(x=x, y=y)
 
     label_email.bind("<Enter>",
-                     lambda event: on_mouse_enter(event, "Click to change email", window_width // 2 - 85, 50))
-    label_email.bind("<Leave>", lambda event: on_mouse_leave(event, f"{self.email}", window_width // 2 - 60, 50))
+                     lambda event: on_mouse_enter(event, "Click to change email", window_width // 2 - 100, 60))
+    label_email.bind("<Leave>", lambda event: on_mouse_leave(event, f"{self.email}", window_width // 2 - 30, 60))
     label_email.bind("<Button-1>", lambda event: on_email_click(event, self))
 
     label_music.bind("<Enter>",
                      lambda event: on_mouse_enter(event, "Click to change music", window_width // 2 - 90,
-                                                  y_height + 65))
+                                                  y_height + 350))
     label_music.bind("<Leave>",
-                     lambda event: on_mouse_leave(event, "Change music", window_width // 2 - 60, y_height + 65))
+                     lambda event: on_mouse_leave(event, "Change music", window_width // 2 - 60, y_height + 350))
     label_music.bind("<Button-1>", lambda event: change_music(event, self))
 
     self.screenshot_var = tk.BooleanVar(value=default_screenshot)
@@ -108,19 +107,24 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
 
     # Volume - Int
 
-    tk.Label(setting_window, text="Volume of music", bg=background_color,
-             activebackground=background_color).place(x=window_width // 2 - 75, y=y_height + 340)
+    tk.Label(setting_window, text="Volume (music)", bg=background_color,
+             activebackground=background_color).place(x=window_width // 2 - 65, y=y_height + 390)
 
     self.volume_var = tk.IntVar(value=default_volume)
     volume_scale = tk.Scale(setting_window, from_=0, to=10, orient='horizontal', variable=self.volume_var,
-                            bg=background_color, activebackground=background_color)
-    volume_scale.place(x=window_width // 2 - 55, y=y_height + 380)
+                            bg=background_color, activebackground=background_color, highlightthickness=0, borderwidth=0)
+    volume_scale.place(x=window_width // 2 - 55, y=y_height + 420)
 
     # Save button
-
+    self.enter_button = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\App_image\\enter_button.png"
+    self.enter_button_1 = Image.open(self.enter_button).resize(
+        (100, 50))
+    self.enter_button_2 = ImageTk.PhotoImage(self.enter_button_1)
+    print(self.enter_button_2)
     enter_button = tk.Button(setting_window, text="Enter",
-                             command=lambda: apply(setting_window, self))
-    enter_button.place(x=window_width // 2 - 30, y=y_height + 440)
+                             command=lambda: apply(setting_window, self), image=self.enter_button_2, borderwidth=0,
+                             highlightthickness=0)
+    enter_button.place(x=window_width // 2 - 55, y=y_height + 480)
 
     setting_window.grab_set()
 
@@ -139,12 +143,14 @@ def on_email_click(event, self):
     else:
         print(f"File {file_path} wasn't found.")
 
+
 def importing():
     from run_app import App
 
     root = tk.Tk()
     app = App(root)
     root.mainloop()
+
 
 def change_music(event, self):
     second_window = tk.Toplevel(self.root)

@@ -163,7 +163,7 @@ def open_second_window(self):
 
         frame_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="n")
 
-        date_label = tk.Label(scrollable_frame, text=f"Info about: {data}")
+        date_label = tk.Label(scrollable_frame, text=f"Info about: {data}", font=("Arial", 14, "bold"))
         date_label.pack()
 
         canvas.pack(side="bottom", fill="both", expand=True)
