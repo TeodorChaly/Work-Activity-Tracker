@@ -118,13 +118,13 @@ def settings_windows(self, default_screenshot, default_afk_mode, default_time_re
     # Save button
     self.enter_button = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "\\App_image\\enter_button.png"
     self.enter_button_1 = Image.open(self.enter_button).resize(
-        (100, 50))
+        (100, 40))
     self.enter_button_2 = ImageTk.PhotoImage(self.enter_button_1)
     print(self.enter_button_2)
     enter_button = tk.Button(setting_window, text="Enter",
                              command=lambda: apply(setting_window, self), image=self.enter_button_2, borderwidth=0,
                              highlightthickness=0)
-    enter_button.place(x=window_width // 2 - 55, y=y_height + 480)
+    enter_button.place(x=window_width // 2 - 57, y=y_height + 480)
 
     setting_window.grab_set()
 
