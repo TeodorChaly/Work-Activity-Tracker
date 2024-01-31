@@ -227,12 +227,12 @@ def open_second_window(self):
                             no_screenshot_label.pack(side=tk.LEFT, padx=5)
 
             else:
-                screenshot_label = tk.Label(scrollable_frame,
-                                            text=f"Screenshots: No")
+                # screenshot_label = tk.Label(scrollable_frame,
+                #                             text=f"Screenshots: No")
                 self.second_window.geometry(f"{500}x{500}+{position_right}+{position_down + 150}")
-                screenshot_label.pack()
+                # screenshot_label.pack()
 
-        new_button = tk.Button(scrollable_frame, text="Back to dates", command=restore_previous_layer)
+        new_button = tk.Button(scrollable_frame, text="Back", command=restore_previous_layer)
         new_button.pack(anchor='n', expand=True, pady=10)
 
         def _on_mousewheel(event):

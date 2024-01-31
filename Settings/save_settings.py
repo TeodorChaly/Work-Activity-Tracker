@@ -30,7 +30,7 @@ def save_settings(self):
         json.dump(settings_data, file)
 
     self.screenshot = screenshot
-    self.time_remainder = int(notification)
+    self.time_remainder = int(notification) * 60
     self.afk_mode = int(afk)
     # self.week_goal_var = int(week_goal)
     self.week_goal = int(week_goal)
@@ -41,7 +41,8 @@ def save_settings(self):
     keyboard_listener = keyboard.Listener(on_press=self.afk_detector.update_last_action_time)
     mouse_listener.start()
     keyboard_listener.start()
-    self.next_notification_time = self.time_remainder * 60
+    self.next_notification_time = self.time_remainder
+    print("Change", self.time_remainder* 60, self.next_notification_time)
     change = self.week_goal * 60 // 7
     self.hours, self.remainder = divmod(change, 60)
     self.goal_label.config(

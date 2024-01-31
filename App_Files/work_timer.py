@@ -200,7 +200,8 @@ class TimerApp:
             self.current_time = self.now.date()
 
             self.current_hour = self.now.strftime("%H:%M:%S")
-            self.random_picture()
+            if self.screenshot:
+                self.random_picture()
             popup_notification("Screenshot taken", 2)
 
     def save_time(self):
@@ -222,7 +223,8 @@ class TimerApp:
 
             self.current_hour = self.now.strftime("%H:%M:%S")
 
-            self.random_picture()
+            if self.screenshot:
+                self.random_picture()
 
             self.timer_start_time = time.time()
 
@@ -264,7 +266,7 @@ class TimerApp:
 
     def wait_for_activity_to_resume_timer(self):
         if not self.afk_detector.is_afk():
-            popup_notification(f"        Welcome back!\n You have been offline for {self.aft_timer}", 2)
+            popup_notification(f"        Welcome back!\n You have been offline for {self.aft_timer//60} min", 2)
             self.aft_timer = 0
             self.start_timer()
             self.now = datetime.now()
@@ -297,6 +299,7 @@ class TimerApp:
                 self.temporary_pause_timer()
 
             self.next_notification_time -= 1
+            print(self.next_notification_time)
             if self.next_notification_time <= 0:
                 notification_play = pyglet.media.Player()
                 notification_play.queue(pyglet.resource.media("notification_sound.mp3"))
@@ -306,6 +309,7 @@ class TimerApp:
                                    5)
 
                 self.next_notification_time = self.time_remainder
+                print("123445")
 
             if self.elapsed_time % 1 == 0:  # Check every 10 seconds and save time and DB
                 self.current_time = datetime.now().date()
