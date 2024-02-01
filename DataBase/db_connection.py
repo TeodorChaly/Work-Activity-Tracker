@@ -1,7 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
-import os
 
 
 def create_db_connection():
