@@ -335,37 +335,51 @@ class TimerApp:
         if time_now >= day_goal:
             self.change_bg("\\App_image\\Circle\\circle_10.png")
             popup_notification("Your reached day's goal!", 2)
-        if time_now // (day_goal / 10) == 0:
+        if time_now // (day_goal / 23) == 0:
             self.change_bg("\\App_image\\Circle\\circle_0.png")
-        # If 1/10 of week_goal
-        if time_now // (day_goal / 10) == 1:
+        if time_now // (day_goal / 23) == 1:
             self.change_bg("\\App_image\\Circle\\circle_1.png")
-        # If 2/10 of week_goal
-        if time_now // (day_goal / 10) == 2:
+        if time_now // (day_goal / 23) == 2:
+            self.change_bg("\\App_image\\Circle\\circle_1_2.png")
+        if time_now // (day_goal / 23) == 3:
+            self.change_bg("\\App_image\\Circle\\circle_1_3.png")
+        if time_now // (day_goal / 23) == 4:
+            self.change_bg("\\App_image\\Circle\\circle_1_4.png")
+        if time_now // (day_goal / 23) == 5:
+            self.change_bg("\\App_image\\Circle\\circle_1_5.png")
+        if time_now // (day_goal / 23) == 6:
+            self.change_bg("\\App_image\\Circle\\circle_1_6.png")
+        if time_now // (day_goal / 23) == 7:
+            self.change_bg("\\App_image\\Circle\\circle_1_7.png")
+        if time_now // (day_goal / 23) == 8:
+            self.change_bg("\\App_image\\Circle\\circle_1_8.png")
+        if time_now // (day_goal / 23) == 9:
+            self.change_bg("\\App_image\\Circle\\circle_1_9.png")
+        if time_now // (day_goal / 23) == 10:
+            self.change_bg("\\App_image\\Circle\\circle_1_10.png")
+        if time_now // (day_goal / 23) == 11:
+            self.change_bg("\\App_image\\Circle\\circle_1_11.png")
+        if time_now // (day_goal / 23) == 12:
+            self.change_bg("\\App_image\\Circle\\circle_1_12.png")
+        if time_now // (day_goal / 23) == 13:
+            self.change_bg("\\App_image\\Circle\\circle_1_13.png")
+        if time_now // (day_goal / 23) == 14:
             self.change_bg("\\App_image\\Circle\\circle_2.png")
-        # If 3/10 of week_goal
-        if time_now // (day_goal / 10) == 3:
+        if time_now // (day_goal / 23) == 15:
             self.change_bg("\\App_image\\Circle\\circle_3.png")
-        # If 4/10 of week_goal
-        if time_now // (day_goal / 10) == 4:
+        if time_now // (day_goal / 23) == 16:
             self.change_bg("\\App_image\\Circle\\circle_4.png")
-        # If 5/10 of week_goal
-        if time_now // (day_goal / 10) == 5:
+        if time_now // (day_goal / 23) == 17:
             self.change_bg("\\App_image\\Circle\\circle_5.png")
-        # If 6/10 of week_goal
-        if time_now // (day_goal / 10) == 6:
+        if time_now // (day_goal / 23) == 18:
             self.change_bg("\\App_image\\Circle\\circle_6.png")
-        # If 7/10 of week_goal
-        if time_now // (day_goal / 10) == 7:
+        if time_now // (day_goal / 23) == 19:
             self.change_bg("\\App_image\\Circle\\circle_7.png")
-        # If 8/10 of week_goal
-        if time_now // (day_goal / 10) == 8:
+        if time_now // (day_goal / 23) == 20:
             self.change_bg("\\App_image\\Circle\\circle_8.png")
-        # If 9/10 of week_goal
-        if time_now // (day_goal / 10) == 9:
+        if time_now // (day_goal / 23) == 21:
             self.change_bg("\\App_image\\Circle\\circle_9.png")
-        # If 10/10 of week_goal
-        if time_now // (day_goal / 10) == 10:
+        if time_now // (day_goal / 23) == 22:
             self.change_bg("\\App_image\\Circle\\circle_10.png")
 
     def change_bg(self, path):
