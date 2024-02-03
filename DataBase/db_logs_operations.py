@@ -7,6 +7,7 @@ def session_db_add(self, current_day, gmail, data, start_time, time, screenshot_
     if self is None:
         connection = create_db_connection()
     else:
+        self.connection.ping(reconnect=True, attempts=3, delay=5)
         connection = self.connection
 
     query = "SELECT id FROM users WHERE email = %s;"

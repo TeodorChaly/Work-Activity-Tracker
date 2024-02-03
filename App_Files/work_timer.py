@@ -312,7 +312,6 @@ class TimerApp:
                                    5)
 
                 self.next_notification_time = self.time_remainder
-                print("123445")
 
             if self.elapsed_time % 1 == 0:  # Check every 10 seconds and save time and DB
                 self.current_time = datetime.now().date()

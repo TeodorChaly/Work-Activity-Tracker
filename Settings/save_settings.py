@@ -42,7 +42,7 @@ def save_settings(self):
     mouse_listener.start()
     keyboard_listener.start()
     self.next_notification_time = self.time_remainder
-    print("Change", self.time_remainder* 60, self.next_notification_time)
+    print("Change", self.time_remainder * 60, self.next_notification_time)
     change = self.week_goal * 60 // 7
     self.hours, self.remainder = divmod(change, 60)
     self.goal_label.config(
@@ -90,7 +90,8 @@ def pre_start_configuration():
             session_time = data[4]
             screen_shot_path = data[5]
 
-            session_db_add(None, current_time, email, current_time, current_hour, session_time, screen_shot_path)
+            connection = None
+            session_db_add(connection, current_time, email, current_time, current_hour, session_time, screen_shot_path)
 
         os.remove("App_Files/time_cash.txt")
 

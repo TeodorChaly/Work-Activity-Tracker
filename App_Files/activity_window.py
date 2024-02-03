@@ -285,7 +285,8 @@ def data_formatting(data):
 
 
 def db_activity_of_last_days(self):
-    connection = create_db_connection()
+    self.connection.ping(reconnect=True, attempts=3, delay=5)
+    connection = self.connection
 
     query = "SELECT id FROM users WHERE email = %s;"
     cursor = connection.cursor()

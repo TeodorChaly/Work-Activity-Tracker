@@ -8,10 +8,10 @@ def create_db_connection():
     connection = None
     try:
         connection = mysql.connector.connect(
-            host=f'localhost',
-            user=f'root',
-            passwd=f'{123}',
-            database=f'timetrack'
+            host=f'rayban247.beget.tech',
+            user=f'rayban247_time',
+            passwd=f'123_Pas',
+            database=f'rayban247_time'
         )
     except Error as e:
         print(f"The error '{e}' occurred")
