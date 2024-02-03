@@ -15,6 +15,7 @@ from App_Files.GUI import popup_notification
 from App_Files.activity_window import open_second_window
 from App_Files.afk_detektor import AFKDetector
 from App_Files.play_music import audio_check, audio_download, play_music_switcher
+from DataBase.db_connection import create_db_connection
 from DataBase.db_logs_operations import session_db_add, get_time_today
 from DataBase.db_time_writing import db_time_write
 from App_Files.images_controller import take_screenshot_all_monitors as take_screenshots
@@ -24,6 +25,8 @@ from Settings.save_settings import load_settings
 
 class TimerApp:
     def __init__(self, root, user_name, user_surname, email):
+        self.connection = create_db_connection()
+
         background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         big_image_path = background_image_path + "\\App_image\\circle.png"
         play_img_path = background_image_path + "\\App_image\\play.png"
@@ -67,7 +70,7 @@ class TimerApp:
         self.current_hour = self.now.strftime("%H:%M:%S")
         self.session_time = 0
         self.current_time = self.now.date()
-        self.elapsed_time = get_time_today(self.email, self.current_time)
+        self.elapsed_time = get_time_today(self.email, self.current_time, self.connection)
         change = self.week_goal * 60 // 7
         self.hours, self.remainder = divmod(change, 60)
 
@@ -186,7 +189,7 @@ class TimerApp:
         if self.running:
             screenshot_path = take_screenshots()
 
-            session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
+            session_db_add(self, self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
                            screenshot_path)
 
             file_path = "App_Files/time_cash.txt"
@@ -208,7 +211,7 @@ class TimerApp:
         hours, remainder = divmod(self.elapsed_time, 3600)
         print(hours, remainder)
         minutes, seconds = divmod(remainder, 60)
-        db_time_write(hours, minutes, seconds, self.email)
+        db_time_write(self, hours, minutes, seconds, self.email)
 
     def start_timer(self):
         if not self.running:
@@ -235,7 +238,7 @@ class TimerApp:
         self.start_button['state'] = tk.NORMAL
         self.pause_button['state'] = tk.DISABLED
 
-        session_db_add(self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
+        session_db_add(self, self.current_time, self.email, self.current_time, self.current_hour, self.session_time,
                        "None")
 
         file_path = "App_Files/time_cash.txt"

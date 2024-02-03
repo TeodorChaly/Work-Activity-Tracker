@@ -3,8 +3,11 @@ from datetime import timedelta
 from DataBase.db_connection import create_db_connection
 
 
-def session_db_add(current_day, gmail, data, start_time, time, screenshot_path):
-    connection = create_db_connection()
+def session_db_add(self, current_day, gmail, data, start_time, time, screenshot_path):
+    if self is None:
+        connection = create_db_connection()
+    else:
+        connection = self.connection
 
     query = "SELECT id FROM users WHERE email = %s;"
     cursor = connection.cursor()
@@ -26,13 +29,13 @@ def session_db_add(current_day, gmail, data, start_time, time, screenshot_path):
         cursor.execute(query, (user_id, data, start_time, time, screenshot_path))
         connection.commit()
         print(f"{user_id} with email {gmail} added to logs_table")
-        get_time_today(gmail, current_day)
+        get_time_today(gmail, current_day, connection)
     except Exception as e:  # No connection with wifi
         print(e)
 
 
-def get_time_today(gmail, today_date):
-    connection = create_db_connection()
+def get_time_today(gmail, today_date, connection):
+    connection = connection
 
     query = "SELECT id FROM users WHERE email = %s;"
     cursor = connection.cursor()

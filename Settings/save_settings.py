@@ -90,7 +90,7 @@ def pre_start_configuration():
             session_time = data[4]
             screen_shot_path = data[5]
 
-            session_db_add(current_time, email, current_time, current_hour, session_time, screen_shot_path)
+            session_db_add(None, current_time, email, current_time, current_hour, session_time, screen_shot_path)
 
         os.remove("App_Files/time_cash.txt")
 
@@ -111,6 +111,4 @@ def clearing_screenshots():
                 source_path = os.path.join(screenshots_folder, filename)
                 destination_path = os.path.join(cleared_folder, filename)
 
-                # Перемещаем файл
                 shutil.move(source_path, destination_path)
-                print(f"Перемещен: {filename}")
