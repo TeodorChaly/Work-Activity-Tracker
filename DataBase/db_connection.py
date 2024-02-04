@@ -9,9 +9,9 @@ def create_db_connection():
     try:
         connection = mysql.connector.connect(
             host=f'rayban247.beget.tech',
-            user=f'rayban247_time',
-            passwd=f'123_Pas',
-            database=f'rayban247_time'
+            user=f'123',
+            passwd=f'123',
+            database=f'123'
         )
     except Error as e:
         print(f"The error '{e}' occurred")
