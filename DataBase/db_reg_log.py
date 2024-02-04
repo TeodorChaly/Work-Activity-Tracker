@@ -27,6 +27,8 @@ def register_user(email, first_name, last_name, password):
     except Error as e:
         print(f"The error '{e}' occurred")
         return False
+    finally:
+        cursor.close()
 
 
 def check_password(hashed_password, user_password):
@@ -59,3 +61,5 @@ def login_user(email, password):
     except Error as e:
         print(f"The error '{e}' occurred")
         return False, None, None
+    finally:
+        cursor.close()

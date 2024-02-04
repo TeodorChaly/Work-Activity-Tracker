@@ -1,4 +1,5 @@
 import os
+import time
 
 import tkinter as tk
 from tkinter import Label, Entry, Button
@@ -242,3 +243,4 @@ if __name__ == "__main__":
         root.mainloop()
     except Exception as e:
         print(e)
+        time.sleep(30)

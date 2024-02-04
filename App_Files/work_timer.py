@@ -28,18 +28,13 @@ class TimerApp:
         self.connection = create_db_connection()
 
         background_image_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        big_image_path = background_image_path + "\\App_image\\circle.png"
         play_img_path = background_image_path + "\\App_image\\play.png"
         pause_img_path = background_image_path + "\\App_image\\stop.png"
 
         self.user_name = user_name
         self.user_surname = user_surname
 
-        bg_image = Image.open(big_image_path)
-        bg_resized_image = bg_image.resize(
-            (500, 500))
-        self.bg_image = ImageTk.PhotoImage(bg_resized_image)
-        self.background_label = tk.Label(root, image=self.bg_image)
+        self.background_label = tk.Label(root)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         self.root = root
@@ -70,7 +65,9 @@ class TimerApp:
         self.current_hour = self.now.strftime("%H:%M:%S")
         self.session_time = 0
         self.current_time = self.now.date()
+
         self.elapsed_time = get_time_today(self.email, self.current_time, self.connection)
+
         change = self.week_goal * 60 // 7
         self.hours, self.remainder = divmod(change, 60)
 
@@ -232,7 +229,6 @@ class TimerApp:
             self.timer_start_time = time.time()
 
     def pause_timer(self):
-
         self.save_time()
         self.running = False
         self.start_button['state'] = tk.NORMAL
@@ -251,6 +247,7 @@ class TimerApp:
         if self.interval > 0:
             self.remaining_interval = self.interval - int((time.time() - self.timer_start_time) * 1000)
             self.interval = 0
+
 
     def temporary_pause_timer(self):
         self.save_time()
