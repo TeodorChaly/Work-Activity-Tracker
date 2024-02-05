@@ -1,6 +1,7 @@
 # Work Activity Tracker App
 
 TimerApp is a time management and productivity application built with Python and Tkinter. It features a simple user interface, ability to track time spent on tasks, and an AFK (Away From Keyboard) mode to monitor user activity. Code of the project is open-source.
+Link to download programm: https://t.me/code_teo/2
 
 ## Features
 
