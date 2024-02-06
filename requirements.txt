@@ -1,0 +1,10 @@
+cryptography==41.0.3
+mysql_connector_repackaged==0.3.1
+Pillow==10.0.0
+Pillow==10.2.0
+pyautogui==0.9.54
+pyglet==2.0.10
+pynput==1.7.6
+python-dotenv==1.0.1
+python_bcrypt==0.3.2
+pytube==15.0.0
