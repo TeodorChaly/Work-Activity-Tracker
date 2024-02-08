@@ -37,9 +37,10 @@ def load_and_decrypt_user_data():
         with open(USER_DATA_FILE, 'rb') as file:
             encrypted_data = file.read()
             decrypted_data = cipher_suite.decrypt(encrypted_data).decode()
+            print(decrypted_data)
 
             username, lastname, email, password = decrypted_data.split("||")
-
+            print(username, lastname, email, password)
             return username, lastname, email, password
 
     return None, None, None, None
@@ -89,8 +90,7 @@ class App:
         self.update_form_view()
 
         username, lastname, email, password = load_and_decrypt_user_data()
-
-        if username and lastname and email and password:
+        if username and email and password:
             self.create_main_interface(username, lastname, email, password)
 
     def toggle_form(self):
